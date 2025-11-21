@@ -1,0 +1,638 @@
+<template>
+  <header class="navbar-container">
+    <div class="navbar">
+      <!-- 品牌标识 -->
+      <div class="brand">
+        <div class="logo">
+          <img src="../assets/logo.png" alt="盾芽双翼logo" class="logo-img">
+        </div>
+        <h1 class="brand-name">
+          盾芽双翼
+          <span class="brand-tagline">AI协同生态平台</span>
+        </h1>
+      </div>
+
+      <!-- 右侧内容区 -->
+      <div class="right-content">
+        <!-- 桌面端导航菜单 -->
+        <nav class="main-nav">
+          <ul class="nav-links">
+            <li class="nav-item" :class="{ active: currentPath === '/homepage' }">
+              <router-link to="/homepage">首页</router-link>
+            </li>
+            <li class="nav-item" :class="{ active: currentPath === '/aiznfk' }">
+              <a href="javascript:;" @click="handleNavClick('/aiznfk')">AI智能反馈</a>
+            </li>
+            <li class="nav-item" :class="{ active: currentPath === '/ar' }">
+              <a href="javascript:;" @click="handleNavClick('/ar')">AR智能导览</a>
+            </li>
+            <li class="nav-item" :class="{ active: currentPath === '/opinion' }">
+              <a href="javascript:;" @click="handleNavClick('/opinion')">意见公示</a>
+            </li>
+            <li class="nav-item" :class="{ active: currentPath === '/merchant-rank' }">
+              <a href="javascript:;" @click="handleNavClick('/merchant-rank')">商家排行</a>
+            </li>
+            <li class="nav-item" :class="{ active: currentPath === '/data-cockpit' }">
+              <a href="javascript:;" @click="handleNavClick('/data-cockpit')">数据驾驶舱</a>
+            </li>
+            <li class="nav-item" :class="{ active: currentPath === '/flex' }">
+              <a href="javascript:;" @click="handleNavClick('/flex')">灵工资源池</a>
+            </li>
+            <li class="nav-item" :class="{ active: currentPath === '/about' }">
+              <router-link to="/about">关于我们</router-link>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- 用户操作区 -->
+        <div class="user-actions">
+          <!-- AI智能入口 -->
+          <div class="ai-entry" @click="goToAICenter">
+            <i class="icon-ai">🤖</i>
+            <span class="ai-text">AI智能中心</span>
+          </div>
+          
+          <!-- 会员状态显示（已登录状态） -->
+          <div class="membership-status" v-if="isLogin">
+            <button class="membership-btn" @click="goToMembershipPage">
+              <span class="membership-icon">🏆</span>
+              <span class="membership-text">我的会员：</span>
+              <span class="membership-level" :class="`level-${currentMembershipLevel}`">
+                {{ getMembershipText(currentMembershipLevel) }}
+              </span>
+            </button>
+          </div>
+          
+          <!-- 登录/注册按钮（未登录状态） -->
+          <button class="btn-primary" 
+                  v-if="!isLogin" 
+                  :class="{ 'login-pulse': showLoginPrompt }">
+            <router-link to="/login">登录/注册</router-link>
+          </button>
+          
+          <!-- 用户菜单（已登录状态） -->
+          <div class="user-menu" v-else>
+            <div class="user-info" @click="toggleDropdown">
+              <img src="https://picsum.photos/id/237/45/45" alt="用户头像" class="user-avatar" />
+              <span class="user-name">{{ username }}</span>
+            </div>
+            <ul class="user-dropdown" v-if="showDropdown">
+              <li @click="handleLogout">退出登录</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 登录提示弹窗 -->
+    <div class="login-toast" v-if="showLoginToast">
+      <p>请先登录以访问该功能</p>
+    </div>
+  </header>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import eventBus from '../utils/eventBus'; // 引入事件总线
+
+// 路由相关
+const router = useRouter();
+const route = useRoute();
+const currentPath = ref(route.path);
+
+// 登录状态管理
+const isLogin = ref(false);
+const username = ref('');
+const showLoginPrompt = ref(false);
+const showLoginToast = ref(false);
+const showDropdown = ref(false);
+// 会员状态管理
+const currentMembershipLevel = ref('non_member'); // non_member, regular, silver, gold, diamond
+
+// 切换下拉菜单
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
+};
+
+// 点击其他区域关闭下拉菜单
+onMounted(() => {
+  const handleClickOutside = (e) => {
+    const userMenu = document.querySelector('.user-menu');
+    if (userMenu && !userMenu.contains(e.target)) {
+      showDropdown.value = false;
+    }
+  };
+  document.addEventListener('click', handleClickOutside);
+  return () => document.removeEventListener('click', handleClickOutside);
+});
+
+// 处理导航点击
+const handleNavClick = (path) => {
+  if (path === '/homepage' || isLogin.value) {
+    router.push(path);
+  } else {
+    showLoginPrompt.value = true;
+    showLoginToast.value = true;
+    
+    setTimeout(() => {
+      showLoginPrompt.value = false;
+    }, 1500);
+    
+    setTimeout(() => {
+      showLoginToast.value = false;
+    }, 2000);
+  }
+};
+
+// 前往AI智能中心
+const goToAICenter = () => {
+  if (isLogin.value) {
+    router.push('/aifriend');
+  } else {
+    showLoginPrompt.value = true;
+    showLoginToast.value = true;
+    
+    setTimeout(() => {
+      showLoginPrompt.value = false;
+    }, 1500);
+    
+    setTimeout(() => {
+      showLoginToast.value = false;
+    }, 2000);
+  }
+};
+
+// 前往会员页面
+const goToMembershipPage = () => {
+  router.push('/MembershipView'); // 你可以替换为实际的会员页面路由
+};
+
+// 获取会员状态文本
+const getMembershipText = (level) => {
+  const membershipTexts = {
+    'non_member': '非会员',
+    'regular': '普通会员',
+    'silver': '白银会员',
+    'gold': '黄金会员',
+    'diamond': '钻石会员'
+  };
+  return membershipTexts[level] || '非会员';
+};
+
+// 退出登录
+const handleLogout = () => {
+  isLogin.value = false;
+  username.value = '';
+  currentMembershipLevel.value = 'non_member'; // 重置会员状态
+  localStorage.removeItem('currentUser');
+  localStorage.removeItem('userMembership'); // 移除会员信息
+  router.push('/homepage');
+  showDropdown.value = false;
+  // 通知其他组件用户已退出
+  eventBus.emit('userLoggedOut');
+};
+
+// 更新登录状态的统一方法
+const updateUserState = (user) => {
+  isLogin.value = true;
+  username.value = user.username;
+  
+  // 先从localStorage获取最新的会员状态，如果有的话
+  const savedMembership = localStorage.getItem('userMembership');
+  if (savedMembership) {
+    currentMembershipLevel.value = savedMembership;
+    // 更新用户对象中的会员等级
+    user.membershipLevel = savedMembership;
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  } else if (user.membershipLevel) {
+    currentMembershipLevel.value = user.membershipLevel;
+    localStorage.setItem('userMembership', user.membershipLevel);
+  } else {
+    // 默认会员状态
+    currentMembershipLevel.value = 'non_member';
+    localStorage.setItem('userMembership', 'non_member');
+  }
+};
+
+// 初始化登录状态
+onMounted(() => {
+  // 1. 优先恢复会员状态
+  const savedMembership = localStorage.getItem('userMembership');
+  if (savedMembership) {
+    currentMembershipLevel.value = savedMembership;
+  }
+  
+  // 2. 从localStorage恢复用户状态（页面刷新时）
+  const savedUser = localStorage.getItem('currentUser');
+  if (savedUser) {
+    const userData = JSON.parse(savedUser);
+    // 如果用户数据中的会员等级与保存的不一致，以localStorage为准
+    if (savedMembership && userData.membershipLevel !== savedMembership) {
+      userData.membershipLevel = savedMembership;
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+    }
+    updateUserState(userData);
+  }
+
+  // 3. 监听登录成功事件（无刷新登录时）
+  const handleLogin = (userInfo) => {
+    updateUserState(userInfo);
+  };
+  eventBus.on('userLoggedIn', handleLogin);
+
+  // 4. 监听退出事件
+  const handleLogoutEvent = () => {
+    isLogin.value = false;
+    username.value = '';
+    currentMembershipLevel.value = 'non_member';
+    localStorage.setItem('userMembership', 'non_member');
+  };
+  eventBus.on('userLoggedOut', handleLogoutEvent);
+  
+  // 5. 监听会员状态更新事件
+  const handleMembershipUpdate = (newLevel) => {
+    currentMembershipLevel.value = newLevel;
+    localStorage.setItem('userMembership', newLevel);
+    
+    // 同时更新localStorage中的用户信息
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      const userData = JSON.parse(savedUser);
+      userData.membershipLevel = newLevel;
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+    }
+  };
+  eventBus.on('membershipUpdated', handleMembershipUpdate);
+
+  // 6. 路由变化监听
+  router.afterEach((to) => {
+    currentPath.value = to.path;
+  });
+
+  // 组件卸载时移除监听，避免内存泄漏
+  onUnmounted(() => {
+    eventBus.off('userLoggedIn', handleLogin);
+    eventBus.off('userLoggedOut', handleLogoutEvent);
+    eventBus.off('membershipUpdated', handleMembershipUpdate);
+  });
+});
+</script>
+<style scoped>
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 30px;
+  height: 70px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 品牌标识 */
+.brand {
+ position: absolute;
+ left:80px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.logo-img {
+  width: 50px;
+  height: 50px;
+}
+
+.brand-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #165DFF;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.brand-tagline {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+/* 右侧内容区 */
+.right-content {
+  position: absolute;
+  right: 75px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 0 1 auto;
+}
+
+/* 导航菜单 */
+.main-nav {
+  display: flex;
+  align-items: center;
+}
+
+.main-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 2px;
+}
+
+.nav-item a {
+  display: block;
+  padding: 0 14px;
+  height: 55px;
+  line-height: 55px;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.nav-item a:hover,
+.nav-item.active a {
+  color: #165DFF;
+  background-color: rgba(22, 93, 255, 0.07);
+  border-radius: 4px;
+}
+
+/* 用户操作区 */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  white-space: nowrap;
+}
+
+/* AI智能入口 */
+.ai-entry {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #165DFF;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.icon-ai {
+  font-size: 18px;
+}
+
+.ai-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* 会员状态样式 */
+.membership-status {
+  display: flex;
+  align-items: center;
+}
+
+.membership-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.membership-btn:hover {
+  background-color: #e9ecef;
+  transform: translateY(-1px);
+}
+
+.membership-icon {
+  font-size: 16px;
+}
+
+.membership-text {
+  color: #666;
+}
+
+.membership-level {
+  font-weight: 600;
+}
+
+/* 不同会员等级颜色 */
+.level-non_member {
+  color: #666;
+}
+
+.level-regular {
+  color: #333;
+}
+
+.level-silver {
+  color: #94a3b8;
+}
+
+.level-gold {
+  color: #f59e0b;
+}
+
+.level-diamond {
+  color: #06b6d4;
+}
+
+/* 登录/注册按钮样式 */
+.btn-primary {
+  background-color: #165DFF;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  background-color: #0E4CD1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(22, 93, 255, 0.15);
+}
+
+.btn-primary a {
+  color: white;
+  text-decoration: none;
+}
+
+/* 登录按钮提示动画 */
+.login-pulse {
+  animation: pulse 1.2s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(22, 93, 255, 0.4);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 8px rgba(22, 93, 255, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(22, 93, 255, 0);
+  }
+}
+
+/* 已登录用户样式 */
+.user-menu {
+  position: relative;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.user-avatar:hover {
+  border-color: #165DFF;
+  transform: translateY(-1px);
+}
+
+.user-name {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 50px;
+  right: -53px;
+  min-width: 180px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: all 0.3s;
+  z-index: 999;
+}
+
+.user-menu:hover .user-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-dropdown li {
+  list-style: none;
+}
+
+.user-dropdown li a,
+.user-dropdown li {
+  display: block;
+  padding: 9px 20px;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+.user-dropdown li:hover {
+  background-color: rgba(22, 93, 255, 0.07);
+}
+
+/* 登录提示弹窗 */
+.login-toast {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background-color: #fff;
+  border: 1px solid #165DFF;
+  color: #165DFF;
+  padding: 10px 20px;
+  border-radius: 4px;
+  box-shadow: 0 3px 10px rgba(22, 93, 255, 0.15);
+  z-index: 1001;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* 响应式调整 */
+@media (max-width: 1366px) {
+  .navbar {
+    padding: 0 20px;
+  }
+  
+  .nav-item a {
+    padding: 0 12px;
+    font-size: 0.9rem;
+  }
+  
+  .brand-name {
+    font-size: 1.5rem;
+  }
+  
+  .membership-text {
+    display: none;
+  }
+}
+
+@media (max-width: 1200px) {
+  .nav-item a {
+    padding: 0 9px;
+    font-size: 0.85rem;
+  }
+  
+  .right-content {
+    gap: 12px;
+  }
+  
+  .user-name {
+    display: none; /* 屏幕较小时隐藏用户名，只显示头像 */
+  }
+}
+</style>
