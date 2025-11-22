@@ -814,7 +814,7 @@ height: 100%;
 
 /* 头部样式 */
 .header {
-  height:40px;
+  height:50px;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
@@ -839,12 +839,16 @@ height: 100%;
 }
 
 .logo-icon {
+    position: relative;
+  top: 14px;
   width: 32px;
   height: 32px;
   color: #3b82f6;
 }
 
 .logo-text {
+  position: relative;
+  top: 14px;
   font-size: 23px;
   font-weight: 600;
   color: black;
@@ -854,11 +858,12 @@ height: 100%;
 }
 
 .nav-actions {
+
   position: absolute;
   right: 3%;
   display: flex;
   gap: 20px;
-    top: 1%;
+    top: 13px;
 
 }
 
