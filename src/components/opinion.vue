@@ -369,7 +369,7 @@ height: 100%;
 }
 /* 新增居中容器样式 */
 .board-container {
-  max-width: 1000px; /* 限制最大宽度 */
+  width: 1000px; /* 限制最大宽度 */
   margin: 40px auto; /* 水平居中 */
 }
 
@@ -411,12 +411,13 @@ height: 100%;
   padding: 15px 20px;
   background-color: #f8f9fa;
   border-radius: 8px;
-  min-width: 120px;
+  min-width: 150px;
 }
 
 .stat-number {
   display: block;
   font-size: 28px;
+ 
   font-weight: bold;
   color: #3498db;
   margin-bottom: 5px;
