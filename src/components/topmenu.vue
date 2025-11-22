@@ -17,8 +17,8 @@
         <!-- 桌面端导航菜单 -->
         <nav class="main-nav">
           <ul class="nav-links">
-            <!-- 未登录/已登录 均显示的菜单项 - 首页激活判断：匹配 / 和 /homepage -->
-            <li class="nav-item" :class="{ active: currentPath === '/homepage' || currentPath === '/' }">
+            <!-- 未登录/已登录 均显示的菜单项 -->
+            <li class="nav-item" :class="{ active: currentPath === '/homepage' }">
               <router-link to="/homepage">首页</router-link>
             </li>
 
@@ -78,16 +78,16 @@
             <span class="ai-text">AI智能中心</span>
           </div>
           
-          <!-- 会员状态显示（仅商家登录状态） -->
-          <div class="membership-status" v-if="isLogin && userRole === 'merchant'">
-            <button class="membership-btn" @click="goToMembershipPage">
-              <span class="membership-icon">🏆</span>
-              <span class="membership-text">我的会员：</span>
-              <span class="membership-level" :class="`level-${currentMembershipLevel}`">
-                {{ getMembershipText(currentMembershipLevel) }}
-              </span>
-            </button>
-          </div>
+      <!-- 会员状态显示（仅商家登录状态） -->
+<div class="membership-status" v-if="isLogin && userRole === 'merchant'">
+  <button class="membership-btn" @click="goToMembershipPage">
+    <span class="membership-icon">🏆</span>
+    <span class="membership-text">我的会员：</span>
+    <span class="membership-level" :class="`level-${currentMembershipLevel}`">
+      {{ getMembershipText(currentMembershipLevel) }}
+    </span>
+  </button>
+</div>
           
           <!-- 登录/注册按钮（未登录状态） -->
           <button class="btn-primary" v-if="!isLogin">
@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import eventBus from '../utils/eventBus'; // 引入事件总线
 
@@ -124,15 +124,6 @@ import eventBus from '../utils/eventBus'; // 引入事件总线
 const router = useRouter();
 const route = useRoute();
 const currentPath = ref(route.path);
-
-// 监听路由变化，实时更新currentPath（修复部署后路由同步问题）
-watch(
-  () => route.path,
-  (newPath) => {
-    currentPath.value = newPath;
-  },
-  { immediate: true } // 初始加载时立即执行
-);
 
 // 登录状态管理
 const isLogin = ref(false);
@@ -158,24 +149,18 @@ onMounted(() => {
     }
   };
   document.addEventListener('click', handleClickOutside);
-  
-  // 组件卸载时移除事件监听（修复原代码监听移除时机问题）
-  onUnmounted(() => {
-    document.removeEventListener('click', handleClickOutside);
-  });
+  return () => document.removeEventListener('click', handleClickOutside);
 });
 
 // 处理导航点击（已通过角色控制显示，直接跳转）
 const handleNavClick = (path) => {
   router.push(path);
-  showDropdown.value = false; // 跳转时关闭下拉菜单
 };
 
 // 前往AI智能中心（需要登录验证）
 const goToAICenter = () => {
   if (isLogin.value) {
     router.push('/aifriend');
-    showDropdown.value = false;
   } else {
     showLoginToast.value = true;
     setTimeout(() => {
@@ -186,8 +171,7 @@ const goToAICenter = () => {
 
 // 前往会员页面
 const goToMembershipPage = () => {
-  router.push('/MembershipView');
-  showDropdown.value = false; // 跳转时关闭下拉菜单
+  router.push('/MembershipView'); // 替换为实际会员页面路由
 };
 
 // 获取会员状态文本 - 移除非会员，更新普通会员为普通用户
@@ -301,7 +285,12 @@ onMounted(() => {
   };
   eventBus.on('membershipUpdated', handleMembershipUpdate);
 
-  // 组件卸载时移除所有事件监听
+  // 6. 路由变化监听
+  router.afterEach((to) => {
+    currentPath.value = to.path;
+  });
+
+  // 组件卸载时移除监听
   onUnmounted(() => {
     eventBus.off('userLoggedIn', handleLogin);
     eventBus.off('userLoggedOut', handleLogoutEvent);
@@ -309,6 +298,7 @@ onMounted(() => {
   });
 });
 </script>
+
 <style scoped>
 .navbar-container {
   position: fixed;
