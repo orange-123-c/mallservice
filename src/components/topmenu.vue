@@ -17,27 +17,53 @@
         <!-- 桌面端导航菜单 -->
         <nav class="main-nav">
           <ul class="nav-links">
+            <!-- 未登录/已登录 均显示的菜单项 -->
             <li class="nav-item" :class="{ active: currentPath === '/homepage' }">
               <router-link to="/homepage">首页</router-link>
             </li>
-            <li class="nav-item" :class="{ active: currentPath === '/aiznfk' }">
-              <a href="javascript:;" @click="handleNavClick('/aiznfk')">AI智能反馈</a>
-            </li>
-            <li class="nav-item" :class="{ active: currentPath === '/ar' }">
-              <a href="javascript:;" @click="handleNavClick('/ar')">AR智能导览</a>
-            </li>
-            <li class="nav-item" :class="{ active: currentPath === '/opinion' }">
-              <a href="javascript:;" @click="handleNavClick('/opinion')">意见公示</a>
-            </li>
-            <li class="nav-item" :class="{ active: currentPath === '/merchant-rank' }">
-              <a href="javascript:;" @click="handleNavClick('/merchant-rank')">商家排行</a>
-            </li>
-            <li class="nav-item" :class="{ active: currentPath === '/data-cockpit' }">
-              <a href="javascript:;" @click="handleNavClick('/data-cockpit')">数据驾驶舱</a>
-            </li>
-            <li class="nav-item" :class="{ active: currentPath === '/flex' }">
-              <a href="javascript:;" @click="handleNavClick('/flex')">灵工资源池</a>
-            </li>
+
+            <!-- 用户登录后显示（排除数据驾驶舱） -->
+            <template v-if="isLogin && userRole === 'user'">
+              <li class="nav-item" :class="{ active: currentPath === '/aiznfk' }">
+                <a href="javascript:;" @click="handleNavClick('/aiznfk')">AI智能反馈</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/ar' }">
+                <a href="javascript:;" @click="handleNavClick('/ar')">AR智能导览</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/opinion' }">
+                <a href="javascript:;" @click="handleNavClick('/opinion')">意见公示</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/merchant-rank' }">
+                <a href="javascript:;" @click="handleNavClick('/merchant-rank')">商家排行</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/flex' }">
+                <a href="javascript:;" @click="handleNavClick('/flex')">灵工资源池</a>
+              </li>
+            </template>
+
+            <!-- 商家登录后显示（全部菜单） -->
+            <template v-if="isLogin && userRole === 'merchant'">
+              <li class="nav-item" :class="{ active: currentPath === '/aiznfk' }">
+                <a href="javascript:;" @click="handleNavClick('/aiznfk')">AI智能反馈</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/ar' }">
+                <a href="javascript:;" @click="handleNavClick('/ar')">AR智能导览</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/opinion' }">
+                <a href="javascript:;" @click="handleNavClick('/opinion')">意见公示</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/merchant-rank' }">
+                <a href="javascript:;" @click="handleNavClick('/merchant-rank')">商家排行</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/data-cockpit' }">
+                <a href="javascript:;" @click="handleNavClick('/data-cockpit')">数据驾驶舱</a>
+              </li>
+              <li class="nav-item" :class="{ active: currentPath === '/flex' }">
+                <a href="javascript:;" @click="handleNavClick('/flex')">灵工资源池</a>
+              </li>
+            </template>
+
+            <!-- 未登录/已登录 均显示的菜单项 -->
             <li class="nav-item" :class="{ active: currentPath === '/about' }">
               <router-link to="/about">关于我们</router-link>
             </li>
@@ -52,21 +78,18 @@
             <span class="ai-text">AI智能中心</span>
           </div>
           
-          <!-- 会员状态显示（已登录状态） -->
-          <div class="membership-status" v-if="isLogin">
-            <button class="membership-btn" @click="goToMembershipPage">
-              <span class="membership-icon">🏆</span>
-              <span class="membership-text">我的会员：</span>
-              <span class="membership-level" :class="`level-${currentMembershipLevel}`">
-                {{ getMembershipText(currentMembershipLevel) }}
-              </span>
-            </button>
-          </div>
-          
+       <!-- 会员状态显示（仅商家登录状态） -->
+<div class="membership-status" v-if="isLogin && userRole === 'merchant'">
+  <button class="membership-btn" @click="goToMembershipPage">
+    <span class="membership-icon">🏆</span>
+    <span class="membership-text">我的会员：</span>
+    <span class="membership-level" :class="`level-${currentMembershipLevel}`">
+      {{ getMembershipText(currentMembershipLevel) }}
+    </span>
+  </button>
+</div>
           <!-- 登录/注册按钮（未登录状态） -->
-          <button class="btn-primary" 
-                  v-if="!isLogin" 
-                  :class="{ 'login-pulse': showLoginPrompt }">
+          <button class="btn-primary" v-if="!isLogin">
             <router-link to="/login">登录/注册</router-link>
           </button>
           
@@ -84,7 +107,7 @@
       </div>
     </div>
 
-    <!-- 登录提示弹窗 -->
+    <!-- 登录提示弹窗（仅AI智能中心需要） -->
     <div class="login-toast" v-if="showLoginToast">
       <p>请先登录以访问该功能</p>
     </div>
@@ -104,11 +127,12 @@ const currentPath = ref(route.path);
 // 登录状态管理
 const isLogin = ref(false);
 const username = ref('');
-const showLoginPrompt = ref(false);
+const userRole = ref(''); // 存储用户角色（user/merchant）
 const showLoginToast = ref(false);
 const showDropdown = ref(false);
-// 会员状态管理
-const currentMembershipLevel = ref('non_member'); // non_member, regular, silver, gold, diamond
+
+// 会员状态管理 - 移除non_member，默认普通用户
+const currentMembershipLevel = ref('regular'); // regular, silver, gold, diamond
 
 // 切换下拉菜单
 const toggleDropdown = () => {
@@ -127,36 +151,17 @@ onMounted(() => {
   return () => document.removeEventListener('click', handleClickOutside);
 });
 
-// 处理导航点击
+// 处理导航点击（已通过角色控制显示，直接跳转）
 const handleNavClick = (path) => {
-  if (path === '/homepage' || isLogin.value) {
-    router.push(path);
-  } else {
-    showLoginPrompt.value = true;
-    showLoginToast.value = true;
-    
-    setTimeout(() => {
-      showLoginPrompt.value = false;
-    }, 1500);
-    
-    setTimeout(() => {
-      showLoginToast.value = false;
-    }, 2000);
-  }
+  router.push(path);
 };
 
-// 前往AI智能中心
+// 前往AI智能中心（需要登录验证）
 const goToAICenter = () => {
   if (isLogin.value) {
     router.push('/aifriend');
   } else {
-    showLoginPrompt.value = true;
     showLoginToast.value = true;
-    
-    setTimeout(() => {
-      showLoginPrompt.value = false;
-    }, 1500);
-    
     setTimeout(() => {
       showLoginToast.value = false;
     }, 2000);
@@ -165,78 +170,89 @@ const goToAICenter = () => {
 
 // 前往会员页面
 const goToMembershipPage = () => {
-  router.push('/MembershipView'); // 你可以替换为实际的会员页面路由
+  router.push('/MembershipView'); // 替换为实际会员页面路由
 };
 
-// 获取会员状态文本
+// 获取会员状态文本 - 移除非会员，更新普通会员为普通用户
 const getMembershipText = (level) => {
   const membershipTexts = {
-    'non_member': '非会员',
-    'regular': '普通会员',
+    'regular': '普通用户',
     'silver': '白银会员',
     'gold': '黄金会员',
     'diamond': '钻石会员'
   };
-  return membershipTexts[level] || '非会员';
+  return membershipTexts[level] || '普通用户';
 };
 
 // 退出登录
 const handleLogout = () => {
   isLogin.value = false;
   username.value = '';
-  currentMembershipLevel.value = 'non_member'; // 重置会员状态
+  userRole.value = ''; // 清空角色
+  currentMembershipLevel.value = 'regular'; // 退出登录后仍保持普通用户基础等级
   localStorage.removeItem('currentUser');
-  localStorage.removeItem('userMembership'); // 移除会员信息
+  localStorage.removeItem('userMembership');
   router.push('/homepage');
   showDropdown.value = false;
-  // 通知其他组件用户已退出
   eventBus.emit('userLoggedOut');
 };
 
-// 更新登录状态的统一方法
+// 更新登录状态（包含角色存储）
 const updateUserState = (user) => {
   isLogin.value = true;
   username.value = user.username;
-  
-  // 先从localStorage获取最新的会员状态，如果有的话
+  userRole.value = user.role; // 保存用户角色
+
+  // 恢复会员状态 - 确保不会出现non_member
   const savedMembership = localStorage.getItem('userMembership');
   if (savedMembership) {
     currentMembershipLevel.value = savedMembership;
-    // 更新用户对象中的会员等级
     user.membershipLevel = savedMembership;
     localStorage.setItem('currentUser', JSON.stringify(user));
   } else if (user.membershipLevel) {
+    // 如果用户有会员等级但本地没有存储，使用用户的等级
     currentMembershipLevel.value = user.membershipLevel;
     localStorage.setItem('userMembership', user.membershipLevel);
   } else {
-    // 默认会员状态
-    currentMembershipLevel.value = 'non_member';
-    localStorage.setItem('userMembership', 'non_member');
+    // 默认普通用户
+    currentMembershipLevel.value = 'regular';
+    localStorage.setItem('userMembership', 'regular');
   }
 };
 
 // 初始化登录状态
 onMounted(() => {
-  // 1. 优先恢复会员状态
+  // 1. 恢复会员状态 - 处理旧数据中的non_member
   const savedMembership = localStorage.getItem('userMembership');
-  if (savedMembership) {
+  if (savedMembership === 'non_member') {
+    // 将原非会员转换为普通用户
+    currentMembershipLevel.value = 'regular';
+    localStorage.setItem('userMembership', 'regular');
+  } else if (savedMembership) {
     currentMembershipLevel.value = savedMembership;
+  } else {
+    currentMembershipLevel.value = 'regular';
   }
-  
-  // 2. 从localStorage恢复用户状态（页面刷新时）
+
+  // 2. 恢复用户状态（含角色）
   const savedUser = localStorage.getItem('currentUser');
   if (savedUser) {
     const userData = JSON.parse(savedUser);
-    // 如果用户数据中的会员等级与保存的不一致，以localStorage为准
-    if (savedMembership && userData.membershipLevel !== savedMembership) {
-      userData.membershipLevel = savedMembership;
+    // 处理用户数据中的旧会员等级
+    if (userData.membershipLevel === 'non_member') {
+      userData.membershipLevel = 'regular';
       localStorage.setItem('currentUser', JSON.stringify(userData));
+      localStorage.setItem('userMembership', 'regular');
     }
     updateUserState(userData);
   }
 
-  // 3. 监听登录成功事件（无刷新登录时）
+  // 3. 监听登录成功事件
   const handleLogin = (userInfo) => {
+    // 确保登录用户不会有non_member状态
+    if (userInfo.membershipLevel === 'non_member') {
+      userInfo.membershipLevel = 'regular';
+    }
     updateUserState(userInfo);
   };
   eventBus.on('userLoggedIn', handleLogin);
@@ -245,17 +261,20 @@ onMounted(() => {
   const handleLogoutEvent = () => {
     isLogin.value = false;
     username.value = '';
-    currentMembershipLevel.value = 'non_member';
-    localStorage.setItem('userMembership', 'non_member');
+    userRole.value = '';
+    currentMembershipLevel.value = 'regular'; // 退出后保持普通用户
+    localStorage.setItem('userMembership', 'regular');
   };
   eventBus.on('userLoggedOut', handleLogoutEvent);
-  
+
   // 5. 监听会员状态更新事件
   const handleMembershipUpdate = (newLevel) => {
+    // 确保不会设置为non_member
+    if (!['regular', 'silver', 'gold', 'diamond'].includes(newLevel)) {
+      newLevel = 'regular';
+    }
     currentMembershipLevel.value = newLevel;
     localStorage.setItem('userMembership', newLevel);
-    
-    // 同时更新localStorage中的用户信息
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       const userData = JSON.parse(savedUser);
@@ -270,7 +289,7 @@ onMounted(() => {
     currentPath.value = to.path;
   });
 
-  // 组件卸载时移除监听，避免内存泄漏
+  // 组件卸载时移除监听
   onUnmounted(() => {
     eventBus.off('userLoggedIn', handleLogin);
     eventBus.off('userLoggedOut', handleLogoutEvent);
@@ -278,6 +297,7 @@ onMounted(() => {
   });
 });
 </script>
+
 <style scoped>
 .navbar-container {
   position: fixed;
@@ -303,8 +323,8 @@ onMounted(() => {
 
 /* 品牌标识 */
 .brand {
- position: absolute;
- left:80px;
+  position: absolute;
+  left: 80px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -442,11 +462,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* 不同会员等级颜色 */
-.level-non_member {
-  color: #666;
-}
-
+/* 不同会员等级颜色 - 移除non_member样式 */
 .level-regular {
   color: #333;
 }
@@ -485,26 +501,6 @@ onMounted(() => {
 .btn-primary a {
   color: white;
   text-decoration: none;
-}
-
-/* 登录按钮提示动画 */
-.login-pulse {
-  animation: pulse 1.2s ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(22, 93, 255, 0.4);
-  }
-  50% {
-    transform: scale(1.15);
-    box-shadow: 0 0 0 8px rgba(22, 93, 255, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(22, 93, 255, 0);
-  }
 }
 
 /* 已登录用户样式 */
@@ -564,7 +560,6 @@ onMounted(() => {
   list-style: none;
 }
 
-.user-dropdown li a,
 .user-dropdown li {
   display: block;
   padding: 9px 20px;

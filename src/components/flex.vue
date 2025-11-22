@@ -29,7 +29,8 @@
           
           <!-- 用户信息和操作按钮 -->
           <div class="user-actions">
-            <button class="publish-btn" @click="showPublishModal = true">
+            <!-- 只有商家能看到发布兼职按钮 -->
+            <button v-if="userRole === 'merchant'" class="publish-btn" @click="showPublishModal = true">
               <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
                 <path d="M512 128c-212.8 0-384 171.2-384 384s171.2 384 384 384 384-171.2 384-384-171.2-384-384-384zm0 704c-176 0-320-144-320-320s144-320 320-320 320 144 320 320-144 320-320 320z" fill="#fff"/>
                 <path d="M512 224c-8.8 0-16 7.2-16 16v256H240c-8.8 0-16 7.2-16 16s7.2 16 16 16h256v256c0 8.8 7.2 16 16 16s16-7.2 16-16V512h256c8.8 0 16-7.2 16-16s-7.2-16-16-16H528V240c0-8.8-7.2-16-16-16z" fill="#fff"/>
@@ -37,7 +38,11 @@
               发布兼职
             </button>
             
-         
+            <!-- 用户角色显示 -->
+            <div class="user-profile">
+              <div class="avatar">{{ userRole === 'user' ? '用' : '商' }}</div>
+              <span class="username">{{ userRole === 'user' ? '用户登录' : '商家登录' }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -110,7 +115,7 @@
               </button>
               <button class="refresh-btn" @click="refreshChart('category')">
                 <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
-                  <path d="M716.8 512c0-4.4-3.6-8-8-8H592c-4.4 0-8 3.6-8 8v192c0 17.7-14.3 32-32 32s-32-14.3-32-32V352c0-17.7 14.3-32 32-32s32 14.3 32 32v56.9l186.1-186.1c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L650.7 512H716.8zM512 736c-123.5 0-224-100.5-224-224s100.5-224 224-224c42.1 0 81.4 12.4 114 35.3l-27.7 27.7C581.9 338.5 550.2 320 512 320c-88.4 0-160 71.6-160 160s71.6 160 160 160c38.2 0 69.9-18.5 90.3-48l27.7 27.7C593.4 723.6 554.1 736 512 736z" fill="#409eff"/>
+                  <path d="M716.8 512c0-4.4-3.6-8-8-8H592c-4.4 0-8 3.6-8 8v192c0 17.7-14.3-32-32-32s-32 14.3-32 32V352c0-17.7 14.3-32 32-32s32 14.3 32 32v56.9l186.1-186.1c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L650.7 512H716.8zM512 736c-123.5 0-224-100.5-224-224s100.5-224 224-224c42.1 0 81.4 12.4 114 35.3l-27.7 27.7C581.9 338.5 550.2 320 512 320c-88.4 0-160 71.6-160 160s71.6 160 160 160c38.2 0 69.9-18.5 90.3-48l27.7 27.7C593.4 723.6 554.1 736 512 736z" fill="#409eff"/>
                 </svg>
               </button>
             </div>
@@ -131,7 +136,7 @@
             <h2>岗位申请热度</h2>
             <button class="refresh-btn" @click="refreshHeatData">
               <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
-                <path d="M716.8 512c0-4.4-3.6-8-8-8H592c-4.4 0-8 3.6-8 8v192c0 17.7-14.3 32-32 32s-32-14.3-32-32V352c0-17.7 14.3-32 32-32s32 14.3 32 32v56.9l186.1-186.1c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L650.7 512H716.8zM512 736c-123.5 0-224-100.5-224-224s100.5-224 224-224c42.1 0 81.4 12.4 114 35.3l-27.7 27.7C581.9 338.5 550.2 320 512 320c-88.4 0-160 71.6-160 160s71.6 160 160 160c38.2 0 69.9-18.5 90.3-48l27.7 27.7C593.4 723.6 554.1 736 512 736z" fill="#409eff"/>
+                <path d="M716.8 512c0-4.4-3.6-8-8-8H592c-4.4 0-8 3.6-8 8v192c0 17.7-14.3-32-32-32s-32 14.3-32 32V352c0-17.7 14.3-32 32-32s32 14.3 32 32v56.9l186.1-186.1c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L650.7 512H716.8zM512 736c-123.5 0-224-100.5-224-224s100.5-224 224-224c42.1 0 81.4 12.4 114 35.3l-27.7 27.7C581.9 338.5 550.2 320 512 320c-88.4 0-160 71.6-160 160s71.6 160 160 160c38.2 0 69.9-18.5 90.3-48l27.7 27.7C593.4 723.6 554.1 736 512 736z" fill="#409eff"/>
               </svg>
             </button>
           </div>
@@ -200,7 +205,13 @@
                     <div class="job-title">{{ job.title }}</div>
                     <div class="job-company">{{ job.company }}</div>
                     <div class="job-salary">{{ job.salary }}</div>
-                    <button class="apply-btn" @click="applyJob(job)">立即申请</button>
+                    <button 
+                      class="apply-btn" 
+                      @click="userRole === 'user' ? applyJob(job) : viewApplications(job)"
+                      :class="{ 'view-apply-btn': userRole === 'merchant' }"
+                    >
+                      {{ userRole === 'user' ? '立即申请' : '查看申请' }}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -212,7 +223,10 @@
 
     <!-- 兼职岗位列表区域 (独占一行) -->
     <div class="job-list-container">
-    <JobListComponent/>
+      <JobListComponent 
+        :user-role="userRole"
+        @view-detail="handleViewDetail"
+      />
     </div>
 
     <!-- 发布兼职弹窗 -->
@@ -262,15 +276,105 @@
         </div>
       </div>
     </div>
+
+    <!-- 岗位详情/申请列表弹窗 -->
+    <div class="modal-overlay" v-if="showDetailModal">
+      <div class="modal-content" :style="{ width: detailModalWidth }">
+        <div class="modal-header">
+          <h3>{{ userRole === 'user' ? '岗位详情' : '申请列表' }}</h3>
+          <button class="close-btn" @click="showDetailModal = false">×</button>
+        </div>
+        <div class="modal-body">
+          <!-- 用户看到的岗位详情 -->
+          <div v-if="userRole === 'user' && currentJob">
+            <div class="job-detail">
+              <h4>{{ currentJob.title }}</h4>
+              <div class="detail-section">
+                <p><strong>公司：</strong>{{ currentJob.company }}</p>
+                <p><strong>薪资：</strong>{{ currentJob.salary }}</p>
+                <p><strong>地点：</strong>{{ currentJob.location || '未知' }}</p>
+                <p><strong>发布时间：</strong>{{ currentJob.publishTime || '未知' }}</p>
+              </div>
+              <div class="detail-section">
+                <h5>岗位描述</h5>
+                <p>{{ currentJob.description || '该岗位暂无详细描述' }}</p>
+              </div>
+              <div class="apply-section">
+                <button class="apply-now-btn" @click="submitApplication">立即申请</button>
+                <p class="apply-note">申请后我们会将您的简历发送至商家邮箱</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 商家看到的申请列表 -->
+          <div v-if="userRole === 'merchant' && currentJob">
+            <div class="applications-list">
+              <h4>{{ currentJob.title }} - 申请列表</h4>
+              <div class="applications-stats">
+                <div class="stat-item">
+                  <span class="stat-number">{{ applicationsData.total }}</span>
+                  <span class="stat-label">总申请人数</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">{{ applicationsData.reviewed }}</span>
+                  <span class="stat-label">已查看</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">{{ applicationsData.approved }}</span>
+                  <span class="stat-label">已通过</span>
+                </div>
+              </div>
+              
+              <table class="applications-table">
+                <thead>
+                  <tr>
+                    <th>申请人</th>
+                    <th>申请时间</th>
+                    <th>联系方式</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(app, index) in applicationsData.list" :key="index">
+                    <td>
+                      <div class="applicant-info">
+                        <div class="applicant-avatar">{{ app.name.charAt(0) }}</div>
+                        <span>{{ app.name }}</span>
+                      </div>
+                    </td>
+                    <td>{{ app.time }}</td>
+                    <td>{{ app.contact }}</td>
+                    <td>
+                      <span class="status-tag" :class="app.status">{{ app.status }}</span>
+                    </td>
+                    <td>
+                      <button class="action-btn view-resume" @click="viewResume(app)">查看简历</button>
+                      <button class="action-btn approve" @click="approveApplication(app)">通过</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" @click="showDetailModal = false">关闭</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 // 这里假设你已经有了这些组件
 import BarChart from './echart/Barchart.vue';
 import LineChart from './echart/Linechart.vue';
 import JobListComponent from './JobListComponent.vue';
+
+// 从localStorage获取用户角色（登录后存储的）
+const userRole = ref('user'); // 默认用户，实际应该从登录状态获取
 
 // 城市名称映射
 const cityNames = ref({
@@ -285,6 +389,11 @@ const selectedCity = ref('shanghai');
 const showLocationSelector = ref(false);
 const showPublishModal = ref(false);
 const showFilterPanel = ref(false);
+
+// 详情弹窗相关
+const showDetailModal = ref(false);
+const currentJob = ref(null);
+const detailModalWidth = ref('500px');
 
 // 核心指标数据
 const totalJobs = ref(128);
@@ -335,118 +444,62 @@ const latestJobs = ref([
     title: '宣传海报设计',
     company: '优衣库 - 静安区交通路中心',
     salary: '¥250-300/天',
-    publishTime: '2小时前发布'
+    publishTime: '2小时前发布',
+    description: '负责商场活动宣传海报设计，要求熟练使用PS、AI等设计软件，有相关经验优先。'
   },
   {
     id: 2,
     title: '餐饮服务生',
     company: '文通冰室 - 浦东新区世纪汇商城',
     salary: '¥180-220/天',
-    publishTime: '1天前发布'
+    publishTime: '1天前发布',
+    description: '负责顾客点餐、上菜、餐桌清理等工作，要求形象良好，有餐饮服务经验。'
   },
   {
     id: 3,
     title: '手机维修技术员',
     company: '苹果授权服务中心',
     salary: '¥300-400/天',
-    publishTime: '2天前发布'
+    publishTime: '2天前发布',
+    description: '负责手机维修工作，要求有相关维修经验，持有电工证优先。'
   },
   {
     id: 4,
     title: '周末促销员',
     company: '可口可乐上海分公司',
     salary: '¥200-250/天',
-    publishTime: '3天前发布'
+    publishTime: '3天前发布',
+    description: '负责商场内产品促销推广，要求沟通能力强，有销售经验优先。'
   }
 ]);
 
-// 岗位列表数据
-const jobList = ref([
-  {
-    id: 1,
-    title: '餐饮服务生',
-    company: '文通冰室',
-    salary: '¥180-220/天',
-    location: '浦东新区柜商花园城',
-    publishTime: '2025-11-17',
-    distance: '0.8km',
-    tags: [
-      { text: '学生可做', type: 'blue' },
-      { text: '包餐', type: 'green' },
-      { text: '就近分配', type: 'yellow' },
-      { text: '短期', type: 'purple' },
-      { text: '急聘', type: 'red' }
-    ]
-  },
-  {
-    id: 2,
-    title: '商场电力维修',
-    company: '苏宁电器',
-    salary: '¥350-400/天',
-    location: '徐汇区港汇广场',
-    publishTime: '2025-11-16',
-    distance: '2.3km',
-    tags: [
-      { text: '技术员', type: 'blue' },
-      { text: '持证优先', type: 'green' },
-      { text: '长期', type: 'purple' },
-      { text: '高薪', type: 'red' }
-    ]
-  },
-  {
-    id: 3,
-    title: '宣传海报设计',
-    company: '优衣库',
-    salary: '¥250-300/天',
-    location: '静安区静安嘉里中心',
-    publishTime: '2025-11-18',
-    distance: '3.5km',
-    tags: [
-      { text: '设计师', type: 'blue' },
-      { text: '远程办公', type: 'green' },
-      { text: '短期', type: 'purple' },
-      { text: '急聘', type: 'red' },
-      { text: '免面试', type: 'yellow' }
-    ]
-  },
-  {
-    id: 4,
-    title: '商场活动策划运营实习生',
-    company: '万达百货',
-    salary: '¥200-250/天',
-    location: '杨浦区五角场万达广场',
-    publishTime: '2025-11-15',
-    distance: '4.2km',
-    tags: [
-      { text: '实习生', type: 'blue' },
-      { text: '学生可做', type: 'green' },
-      { text: '包餐', type: 'yellow' },
-      { text: '长期', type: 'purple' }
-    ]
-  },
-  {
-    id: 5,
-    title: '导购员',
-    company: 'H&M',
-    salary: '¥220-260/天',
-    location: '黄浦区外滩金融中心',
-    publishTime: '2025-11-14',
-    distance: '1.5km',
-    tags: [
-      { text: '促销员', type: 'blue' },
-      { text: '提成', type: 'green' },
-      { text: '就近分配', type: 'yellow' },
-      { text: '短期', type: 'purple' },
-      { text: '兼职', type: 'gray' }
-    ]
+// 模拟申请数据
+const applicationsData = ref({
+  total: 28,
+  reviewed: 15,
+  approved: 8,
+  list: [
+    { name: '张三', time: '2025-11-18 09:23', contact: '138****5678', status: '待审核', resume: '张三-简历.pdf' },
+    { name: '李四', time: '2025-11-18 10:15', contact: '139****1234', status: '已查看', resume: '李四-简历.pdf' },
+    { name: '王五', time: '2025-11-17 16:40', contact: '137****8765', status: '已通过', resume: '王五-简历.pdf' },
+    { name: '赵六', time: '2025-11-17 14:30', contact: '136****4321', status: '已拒绝', resume: '赵六-简历.pdf' },
+    { name: '孙七', time: '2025-11-16 11:20', contact: '135****9876', status: '已通过', resume: '孙七-简历.pdf' }
+  ]
+});
+
+// 组件挂载时获取用户角色
+onMounted(() => {
+  const currentUser = localStorage.getItem('currentUser');
+  if (currentUser) {
+    const userInfo = JSON.parse(currentUser);
+    userRole.value = userInfo.role || 'user';
   }
-]);
+});
 
 // 方法定义
 const changeCity = (city) => {
   selectedCity.value = city;
   showLocationSelector.value = false;
-  // 这里可以添加城市切换后的逻辑
 };
 
 const updateSalaryTrend = () => {
@@ -456,68 +509,100 @@ const updateSalaryTrend = () => {
 };
 
 const refreshHeatData = () => {
-  // 模拟刷新数据
   applicationHeatData.value.forEach(item => {
     item.percentage = Math.floor(Math.random() * 40) + 40;
   });
 };
 
 const refreshChart = (type) => {
-  // 模拟刷新图表数据
   console.log(`刷新${type}图表数据`);
 };
 
 const exportChart = (type) => {
-  // 模拟导出图表
   console.log(`导出${type}图表`);
   alert(`已导出${type === 'category' ? '岗位分类' : '薪资趋势'}图表数据`);
 };
 
 const exportJobList = () => {
-  // 模拟导出岗位列表
   alert('岗位列表已导出');
 };
 
 const viewAllJobs = () => {
-  // 查看全部岗位
   console.log('查看全部岗位');
 };
 
 const applyJob = (job) => {
-  // 申请岗位
-  alert(`已申请岗位：${job.title}`);
+  currentJob.value = job;
+  detailModalWidth.value = '500px';
+  showDetailModal.value = true;
+};
+
+const viewApplications = (job) => {
+  currentJob.value = job;
+  detailModalWidth.value = '800px';
+  showDetailModal.value = true;
+};
+
+const handleViewDetail = (job) => {
+  if (userRole.value === 'user') {
+    applyJob(job); // 用户查看详情
+  } else {
+    viewApplications(job); // 商家查看申请
+  }
+};
+
+const submitApplication = () => {
+  alert('申请已提交！我们会将您的简历发送至商家邮箱。');
+  showDetailModal.value = false;
+};
+
+const viewResume = (app) => {
+  alert(`查看简历：${app.resume}`);
+};
+
+const approveApplication = (app) => {
+  if (app.status !== '已通过') {
+    app.status = '已通过';
+    applicationsData.value.approved++;
+    if (app.status === '待审核') applicationsData.value.reviewed++;
+    alert(`已通过 ${app.name} 的申请！`);
+  }
 };
 
 const viewJobDetail = (job) => {
-  // 查看岗位详情
   console.log('查看岗位详情', job);
 };
 
 const publishJob = () => {
-  // 发布岗位
   alert('岗位发布成功！');
   showPublishModal.value = false;
 };
 
 const applyFilters = () => {
-  // 应用筛选条件
   showFilterPanel.value = false;
   alert('筛选条件已应用');
 };
 
 const resetFilters = () => {
-  // 重置筛选条件
   alert('筛选条件已重置');
+};
+
+// 切换用户角色的方法（用于测试）
+const toggleUserRole = () => {
+  userRole.value = userRole.value === 'user' ? 'merchant' : 'user';
 };
 </script>
 
 <style scoped>
 /* 基础样式 */
 .dashboard-container {
+    background-image: url('../assets/beijing.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+overflow-y: auto;
   padding: 24px;
-  background-color: #f5f7fa;
-  min-height: 100vh;
-  box-sizing: border-box;
+height: 100%;  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -626,7 +711,12 @@ h1 {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  object-fit: cover;
+  background-color: #409eff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
 }
 
 .username {
@@ -1050,6 +1140,14 @@ h1 {
   background-color: #3a8ee6;
 }
 
+.view-apply-btn {
+  background-color: #67c23a;
+}
+
+.view-apply-btn:hover {
+  background-color: #5daf34;
+}
+
 /* 兼职岗位列表区域 */
 .job-list-container {
   width: 100%;
@@ -1363,6 +1461,168 @@ h1 {
   cursor: pointer;
 }
 
+/* 岗位详情样式 */
+.job-detail {
+  line-height: 1.6;
+}
+
+.job-detail h4 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #303133;
+}
+
+.detail-section {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+}
+
+.detail-section h5 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #303133;
+}
+
+.apply-section {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.apply-now-btn {
+  background-color: #409eff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.apply-note {
+  font-size: 12px;
+  color: #909399;
+}
+
+/* 申请列表样式 */
+.applications-list {
+  width: 100%;
+}
+
+.applications-stats {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.applications-stats .stat-item {
+  text-align: center;
+}
+
+.applications-stats .stat-number {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #409eff;
+}
+
+.applications-stats .stat-label {
+  font-size: 12px;
+  color: #909399;
+}
+
+.applications-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.applications-table th,
+.applications-table td {
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.applications-table th {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+}
+
+.applications-table td {
+  font-size: 14px;
+}
+
+.applicant-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.applicant-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #409eff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.status-tag {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.status-tag.待审核 {
+  background-color: #fdf6ec;
+  color: #e6a23c;
+}
+
+.status-tag.已查看 {
+  background-color: #e6f4ff;
+  color: #409eff;
+}
+
+.status-tag.已通过 {
+  background-color: #f0f9ff;
+  color: #67c23a;
+}
+
+.status-tag.已拒绝 {
+  background-color: #fef0f0;
+  color: #f56c6c;
+}
+
+.action-btn {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+  margin-right: 5px;
+}
+
+.view-resume {
+  background-color: #e6f4ff;
+  color: #409eff;
+}
+
+.approve {
+  background-color: #f0f9ff;
+  color: #67c23a;
+}
+
 /* 响应式设计 */
 @media (max-width: 1440px) {
   .charts-grid {
@@ -1373,6 +1633,13 @@ h1 {
 @media (max-width: 1024px) {
   .charts-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .applications-table th:nth-child(4),
+  .applications-table td:nth-child(4),
+  .applications-table th:nth-child(5),
+  .applications-table td:nth-child(5) {
+    display: none;
   }
 }
 
@@ -1390,6 +1657,14 @@ h1 {
   .header-actions {
     width: 100%;
     justify-content: space-between;
+  }
+  
+  .applications-stats {
+    flex-wrap: wrap;
+  }
+  
+  .applications-stats .stat-item {
+    flex: 1 1 40%;
   }
 }
 
@@ -1422,10 +1697,22 @@ h1 {
   .salary {
     text-align: left;
   }
+  
+  .applications-stats .stat-item {
+    flex: 1 1 100%;
+    margin-bottom: 10px;
+  }
+  
+  .applicant-info span {
+    display: none;
+  }
+  
+  .modal-content {
+    width: 95%;
+  }
 }
 
 .c1{height: 370px;}
-.c2{height: 650px;
-}
+.c2{height: 650px;}
 .c3{overflow-y: auto}
 </style>

@@ -1,5 +1,7 @@
 <template>
   <div class="dashboard">
+             <div class="board-container">
+
     <!-- 顶部标题与描述 -->
     <header class="dashboard-header">
       <h1>智能商场数据驾驶舱</h1>
@@ -242,6 +244,7 @@
     </div>
 
     <Slide5></slide5>
+      </div><div></div>
   </div>
 </template>
 
@@ -263,12 +266,21 @@ const dataType = ref('all');
 
 <style scoped>
 .dashboard {
+    background-image: url('../assets/beijing.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+overflow-y: auto;
   padding: 20px;
   background-color: #f8fafc;
-  min-height: 100vh;
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  max-width: 1400px;
+height: 100%;  font-family: 'Segoe UI', Roboto, sans-serif;
   margin: 0 auto;
+}
+
+/* 新增居中容器样式 */
+.board-container {
+  width: 80%; /* 限制最大宽度 */
+  margin: 10px auto; /* 水平居中 */
 }
 
 .dashboard-header {

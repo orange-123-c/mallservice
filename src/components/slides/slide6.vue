@@ -1466,7 +1466,7 @@ defineExpose({ reset });
 }
 
 .apply-btn {
-  background-color: rgba(107, 114, 128, 0.3);
+  background-color: yellowgreen;
   color: white;
   border: none;
   border-radius: 4px;
@@ -1607,6 +1607,8 @@ defineExpose({ reset });
   animation: slideUp 0.4s ease;
   margin: 20px;
   pointer-events: auto;
+    color:white;
+
 }
 
 .banner-modal {
@@ -1883,6 +1885,7 @@ form {
   border-radius: 5px;
   text-align: center;
   cursor: pointer;
+  color: white;
   transition: border 0.3s, background 0.3s;
 }
 

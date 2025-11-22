@@ -4,20 +4,6 @@
     <div class="header">
       <h1>会员专享权益，开启智能购物新体验</h1>
       <p>成为会员，享受个性化服务与专属优惠</p>
-      
-      <!-- 当前会员状态展示 -->
-      <!-- <div class="current-membership-status" v-if="currentUser">
-        <span class="welcome-text">欢迎您，{{ currentUser.username }}</span>
-        <span class="membership-badge" :class="`badge-${currentMembership}`">
-          {{ getMembershipText(currentMembership) }}
-        </span>
-      </div>
-      
-      <div class="btn-group">
-        <button class="join-btn" @click="showJoinModal = true" v-if="!currentUser">立即加入</button>
-        <button class="upgrade-btn" @click="showUpgradeModal = true" v-if="currentUser && currentMembership !== 'diamond'">升级会员</button>
-        <button class="upgrade-btn disabled" v-if="currentUser && currentMembership === 'diamond'">已是最高等级</button>
-      </div> -->
     </div>
 
     <!-- 会员等级概览 -->
@@ -26,23 +12,23 @@
       <div class="level-grid">
         <div class="level-item" :class="{ active: currentMembership === 'regular' }">
           <div class="level-icon">📱</div>
-          <h4>普通会员</h4>
-          <p>免费注册，基础权益</p>
+          <h4>普通用户</h4>
+          <p>免费使用，基础权益</p>
         </div>
         <div class="level-item" :class="{ active: currentMembership === 'silver' }">
           <div class="level-icon">💎</div>
           <h4>白银会员</h4>
-          <p>¥68/月，进阶权益</p>
+          <p>¥49.9/月，进阶权益</p>
         </div>
         <div class="level-item featured" :class="{ active: currentMembership === 'gold' }">
           <div class="level-icon">✨</div>
           <h4>黄金会员</h4>
-          <p>¥198/月，热门选择</p>
+          <p>¥99.9/月，热门选择</p>
         </div>
         <div class="level-item" :class="{ active: currentMembership === 'diamond' }">
           <div class="level-icon">👑</div>
           <h4>钻石会员</h4>
-          <p>¥398/月，尊享权益</p>
+          <p>¥199.9/月，尊享权益</p>
         </div>
       </div>
     </div>
@@ -57,7 +43,7 @@
             <span class="badge ai-badge">AI驱动</span>
           </div>
         </div>
-        
+
         <!-- 客流量高峰预测 -->
         <div class="insight-card traffic-card">
           <div class="card-header">
@@ -67,11 +53,12 @@
           </div>
           <div class="card-content">
             <p>预计本周五18:00-20:00将出现客流量高峰，建议增加2名服务人员。</p>
-            <p class="premium-info" v-if="['gold', 'diamond'].includes(currentMembership)">💎 钻石会员可查看详细的客流量预测模型和人员排班建议</p>
+            <p class="premium-info" v-if="['gold', 'diamond'].includes(currentMembership)">💎 钻石会员可查看详细的客流量预测模型和人员排班建议
+            </p>
             <p class="upgrade-prompt" v-else>升级至<span class="highlight">黄金会员</span>即可查看完整洞察</p>
           </div>
         </div>
-        
+
         <!-- 服务优化建议 -->
         <div class="insight-card service-card">
           <div class="card-header">
@@ -81,11 +68,12 @@
           </div>
           <div class="card-content">
             <p>用户对"等待时间过长"的反馈增加了15%，建议优化服务流程或增加自助服务设备。</p>
-            <p class="premium-info" v-if="['gold', 'diamond'].includes(currentMembership)">💎 钻石会员可获取AI生成的详细流程优化方案和投资回报分析</p>
+            <p class="premium-info" v-if="['gold', 'diamond'].includes(currentMembership)">💎
+              钻石会员可获取AI生成的详细流程优化方案和投资回报分析</p>
             <p class="upgrade-prompt" v-else>升级至<span class="highlight">黄金会员</span>即可查看完整洞察</p>
           </div>
         </div>
-        
+
         <!-- 客户群体分析 -->
         <div class="insight-card customer-card">
           <div class="card-header">
@@ -95,39 +83,43 @@
           </div>
           <div class="card-content">
             <p>25-35岁女性客户满意度最高，但回头率低于平均水平，建议推出针对性会员活动。</p>
-            <p class="premium-info" v-if="['gold', 'diamond'].includes(currentMembership)">💎 钻石会员可查看更详细的客户画像和个性化营销策略</p>
+            <p class="premium-info" v-if="['gold', 'diamond'].includes(currentMembership)">💎 钻石会员可查看更详细的客户画像和个性化营销策略
+            </p>
             <p class="upgrade-prompt" v-else>升级至<span class="highlight">黄金会员</span>即可查看完整洞察</p>
           </div>
         </div>
-        
+
         <!-- 会员专属洞察 -->
         <div class="insight-card premium-card">
           <h3>会员专属洞察</h3>
           <p v-if="['gold', 'diamond'].includes(currentMembership)">升级至钻石会员，可获取更多AI驱动的经营洞察和个性化优化建议</p>
           <p v-else>升级至<span class="highlight">黄金会员</span>即可解锁AI智能洞察功能</p>
-          <button class="generate-more-btn" @click="generateMoreInsights" :disabled="!['gold', 'diamond'].includes(currentMembership)">
+          <button class="generate-more-btn" @click="generateMoreInsights"
+            :disabled="!['gold', 'diamond'].includes(currentMembership)">
             <span class="refresh-icon">🔄</span> 生成更多洞察
           </button>
         </div>
       </div>
-      
+
       <div class="competitor-analysis">
         <div class="section-header">
           <h2>竞争对手对比分析</h2>
           <div class="action-buttons">
-            <select class="comparison-select" @change="handleComparisonChange($event)" :disabled="!['gold', 'diamond'].includes(currentMembership)">
+            <select class="comparison-select" @change="handleComparisonChange($event)"
+              :disabled="!['gold', 'diamond'].includes(currentMembership)">
               <option value="all">全部对比</option>
               <option value="traffic">客流量对比</option>
               <option value="satisfaction">满意度对比</option>
               <option value="conversion">转化率对比</option>
               <option value="awareness">知名度对比</option>
             </select>
-            <button class="export-btn" @click="exportReport" :disabled="!['gold', 'diamond'].includes(currentMembership)">
+            <button class="export-btn" @click="exportReport"
+              :disabled="!['gold', 'diamond'].includes(currentMembership)">
               <span class="export-icon">📊</span> 导出报告
             </button>
           </div>
         </div>
-        
+
         <!-- 对比指标卡片 -->
         <div class="metrics-grid">
           <div class="metric-card traffic-metric">
@@ -147,7 +139,7 @@
             <p class="metric-value">低于竞争对手B 7%</p>
           </div>
         </div>
-        
+
         <!-- 竞争优劣势分析 -->
         <div class="analysis-content">
           <h3>竞争优劣势分析</h3>
@@ -169,8 +161,8 @@
       </div>
     </div>
 
-    <!-- 新增：兼职岗位管理 -->
-    <div class="part-time-jobs" v-if="['gold', 'diamond'].includes(currentMembership)">
+    <!-- 新增：兼职岗位管理（商家角色+黄金及以上会员可见） -->
+    <div class="part-time-jobs" v-if="currentUser?.role === 'merchant' && ['gold', 'diamond'].includes(currentMembership)">
       <div class="jobs-header">
         <h2>兼职岗位管理</h2>
         <div class="jobs-actions">
@@ -182,7 +174,7 @@
           </select>
         </div>
       </div>
-      
+
       <div class="jobs-table">
         <div class="jobs-table-header">
           <div class="table-col job-name">岗位名称</div>
@@ -192,7 +184,7 @@
           <div class="table-col job-status">状态</div>
           <div class="table-col job-actions">操作</div>
         </div>
-        
+
         <div class="jobs-table-body">
           <div class="job-row highlighted">
             <div class="table-col job-name">高级服务员</div>
@@ -207,7 +199,7 @@
               <button class="action-btn delete-btn" @click="deleteJob(1)">🗑️</button>
             </div>
           </div>
-          
+
           <div class="job-row highlighted">
             <div class="table-col job-name">数据分析师</div>
             <div class="table-col job-type">全职</div>
@@ -221,7 +213,7 @@
               <button class="action-btn delete-btn" @click="deleteJob(2)">🗑️</button>
             </div>
           </div>
-          
+
           <div class="job-row">
             <div class="table-col job-name">UI设计师</div>
             <div class="table-col job-type">兼职</div>
@@ -235,7 +227,7 @@
               <button class="action-btn delete-btn" @click="deleteJob(3)">🗑️</button>
             </div>
           </div>
-          
+
           <div class="job-row">
             <div class="table-col job-name">服务员</div>
             <div class="table-col job-type">兼职</div>
@@ -251,7 +243,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 岗位推荐 -->
       <div class="job-recommendations">
         <div class="recommendation-tags">
@@ -272,90 +264,162 @@
       <div class="comparison-table">
         <div class="table-header">
           <div class="table-cell">权益项目</div>
-          <div class="table-cell">普通会员</div>
+          <div class="table-cell">普通用户</div>
           <div class="table-cell">白银会员</div>
           <div class="table-cell">黄金会员</div>
           <div class="table-cell">钻石会员</div>
         </div>
-        
+
         <div class="table-row">
-          <div class="table-cell">智能购物分析</div>
+          <div class="table-cell">基础数据看板</div>
           <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
         </div>
-        
+
         <div class="table-row">
-          <div class="table-cell">专属折扣</div>
-          <div class="table-cell">9.5折</div>
-          <div class="table-cell">9折</div>
-          <div class="table-cell">8.5折</div>
-          <div class="table-cell">8折</div>
-        </div>
-        
-        <div class="table-row">
-          <div class="table-cell">生日礼遇</div>
-          <div class="table-cell">基础礼</div>
-          <div class="table-cell">进阶礼</div>
-          <div class="table-cell">高级礼</div>
-          <div class="table-cell">豪华礼</div>
-        </div>
-        
-        <div class="table-row">
-          <div class="table-cell">免费停车</div>
-          <div class="table-cell">1小时</div>
-          <div class="table-cell">2小时</div>
-          <div class="table-cell">3小时</div>
-          <div class="table-cell">不限时</div>
-        </div>
-        
-        <div class="table-row">
-          <div class="table-cell">优先预约</div>
-          <div class="table-cell"><i class="cross">✗</i></div>
-          <div class="table-cell"><i class="cross">✗</i></div>
+          <div class="table-cell">客流量趋势分析</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
         </div>
-        
+
         <div class="table-row">
-          <div class="table-cell">专属客服</div>
-          <div class="table-cell"><i class="cross">✗</i></div>
-          <div class="table-cell"><i class="cross">✗</i></div>
+          <div class="table-cell">工单处理效率分析</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
         </div>
-        
+
         <div class="table-row">
-          <div class="table-cell">新品优先购</div>
-          <div class="table-cell"><i class="cross">✗</i></div>
-          <div class="table-cell"><i class="cross">✗</i></div>
-          <div class="table-cell"><i class="cross">✗</i></div>
+          <div class="table-cell">用户满意度分析</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
         </div>
-        
+
+        <div class="table-row">
+          <div class="table-cell">热门反馈话题分析</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
         <div class="table-row">
           <div class="table-cell">AI智能洞察</div>
-          <div class="table-cell"><i class="cross">✗</i></div>
-          <div class="table-cell"><i class="cross">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">竞争对手对比分析</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">服务类目热力图</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
         </div>
-        
+
         <div class="table-row">
-          <div class="table-cell">竞争对手分析</div>
-          <div class="table-cell"><i class="cross">✗</i></div>
-          <div class="table-cell"><i class="cross">✗</i></div>
+          <div class="table-cell">高峰时段类型统计</div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
         </div>
-        
+
         <div class="table-row">
-          <div class="table-cell">兼职岗位管理</div>
-          <div class="table-cell"><i class="cross">✗</i></div>
-          <div class="table-cell"><i class="cross">✗</i></div>
+          <div class="table-cell">自定义报表导出</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
           <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">多门店数据对比</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">经营预测模型</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">兼职岗位发布（商家）</div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">岗位置顶权限（商家）</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">广告曝光次数</div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">广告展示位置</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">广告形式</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">专属客户经理</div>
+          <div class="table-cell"><i class="check">✗</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+          <div class="table-cell"><i class="check">✓</i></div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell">价格</div>
+          <div class="table-cell"><i class="check">免费使用</i></div>
+          <div class="table-cell"><i class="check">¥49.9/月</i></div>
+          <div class="table-cell"><i class="check">¥99.9/月</i></div>
+          <div class="table-cell"><i class="check">¥199.9/月</i></div>
         </div>
       </div>
     </div>
@@ -390,26 +454,28 @@
         <div class="plan-card" :class="{ current: currentMembership === 'silver' }">
           <div class="plan-header">
             <h4>白银会员</h4>
-            <div class="plan-price">¥68<span>/月</span></div>
+            <div class="plan-price">¥49.9<span>/月</span></div>
           </div>
           <div class="plan-features">
             <ul>
-              <li>所有普通会员权益</li>
+              <li>所有普通用户权益</li>
               <li>9折专属折扣</li>
               <li>2小时免费停车</li>
               <li>生日进阶礼遇</li>
               <li>消费数据分析报告</li>
+              <li v-if="currentUser?.role === 'merchant'">岗位置顶权限</li>
+              <li v-if="currentUser?.role === 'merchant'">优化广告展示位置</li>
             </ul>
           </div>
           <button class="subscribe-btn" @click="selectPlan('silver')" v-if="currentMembership !== 'silver'">立即订阅</button>
           <span class="current-plan-tag" v-else>当前套餐</span>
         </div>
-        
+
         <div class="plan-card featured" :class="{ current: currentMembership === 'gold' }">
           <div class="featured-badge">最受欢迎</div>
           <div class="plan-header phhj">
             <h4>黄金会员</h4>
-            <div class="plan-price">¥198<span>/月</span></div>
+            <div class="plan-price">¥99.9<span>/月</span></div>
           </div>
           <div class="plan-features">
             <ul>
@@ -419,19 +485,22 @@
               <li>生日高级礼遇</li>
               <li>专属客服服务</li>
               <li>优先预约特权</li>
-              <li>AI智能洞察分析</li>
-              <li>竞争对手分析</li>
-              <li>兼职岗位管理</li>
+              <li>工单处理效率分析</li>
+              <li>用户满意度分析</li>
+              <li>自定义报表导出</li>
+              <li v-if="currentUser?.role === 'merchant'">兼职岗位管理</li>
+              <li v-if="currentUser?.role === 'merchant'">多形式广告展示</li>
+              <li v-if="currentUser?.role === 'merchant'">30次/日曝光提升</li>
             </ul>
           </div>
           <button class="subscribe-btn" @click="selectPlan('gold')" v-if="currentMembership !== 'gold'">立即订阅</button>
           <span class="current-plan-tag" v-else>当前套餐</span>
         </div>
-        
+
         <div class="plan-card" :class="{ current: currentMembership === 'diamond' }">
           <div class="plan-header">
             <h4>钻石会员</h4>
-            <div class="plan-price">¥398<span>/月</span></div>
+            <div class="plan-price">¥199.9<span>/月</span></div>
           </div>
           <div class="plan-features">
             <ul>
@@ -442,11 +511,16 @@
               <li>专属客户经理</li>
               <li>新品优先购</li>
               <li>高端活动邀请</li>
-              <li>详细AI洞察报告</li>
-              <li>定制化分析方案</li>
+              <li>AI智能洞察分析</li>
+              <li>竞争对手对比分析</li>
+              <li>多门店数据对比</li>
+              <li>经营预测模型</li>
+              <li v-if="currentUser?.role === 'merchant'">顶级岗位推荐位</li>
+              <li v-if="currentUser?.role === 'merchant'">定制化营销方案</li>
             </ul>
           </div>
-          <button class="subscribe-btn" @click="selectPlan('diamond')" v-if="currentMembership !== 'diamond'">立即订阅</button>
+          <button class="subscribe-btn" @click="selectPlan('diamond')"
+            v-if="currentMembership !== 'diamond'">立即订阅</button>
           <span class="current-plan-tag" v-else>当前套餐</span>
         </div>
       </div>
@@ -459,12 +533,19 @@
           <h3>注册成为会员</h3>
           <button class="close-modal" @click="showJoinModal = false">×</button>
         </div>
-        
+
         <div class="modal-body">
           <form class="join-form">
             <div class="form-group">
               <label>用户名</label>
               <input type="text" v-model="joinForm.username" placeholder="请输入用户名">
+            </div>
+            <div class="form-group">
+              <label>用户角色</label>
+              <select v-model="joinForm.role">
+                <option value="user">普通用户</option>
+                <option value="merchant">商家</option>
+              </select>
             </div>
             <div class="form-group">
               <label>手机号</label>
@@ -483,7 +564,7 @@
             </div>
           </form>
         </div>
-        
+
         <div class="modal-footer">
           <button class="cancel-btn" @click="showJoinModal = false">取消</button>
           <button class="confirm-btn" @click="confirmJoin">确认注册</button>
@@ -498,15 +579,11 @@
           <h3>升级会员</h3>
           <button class="close-modal" @click="showUpgradeModal = false">×</button>
         </div>
-        
+
         <div class="modal-body">
           <div class="upgrade-options">
-            <div 
-              class="upgrade-option" 
-              v-for="(option, index) in upgradeOptions" 
-              :key="index"
-              :class="{ selected: selectedUpgradeLevel === option.level }"
-              @click="selectedUpgradeLevel = option.level">
+            <div class="upgrade-option" v-for="(option, index) in upgradeOptions" :key="index"
+              :class="{ selected: selectedUpgradeLevel === option.level }" @click="selectedUpgradeLevel = option.level">
               <div class="option-info">
                 <h4>{{ option.title }}</h4>
                 <p class="option-price">{{ option.price }}</p>
@@ -516,13 +593,10 @@
             </div>
           </div>
         </div>
-        
+
         <div class="modal-footer">
           <button class="cancel-btn" @click="showUpgradeModal = false">取消</button>
-          <button 
-            class="confirm-upgrade-btn" 
-            @click="confirmUpgrade"
-            :disabled="!selectedUpgradeLevel">
+          <button class="confirm-upgrade-btn" @click="confirmUpgrade" :disabled="!selectedUpgradeLevel">
             确认升级
           </button>
         </div>
@@ -536,7 +610,7 @@
           <h3>发布新岗位</h3>
           <button class="close-modal" @click="showAddJobModal = false">×</button>
         </div>
-        
+
         <div class="modal-body">
           <form class="job-form">
             <div class="form-group">
@@ -565,7 +639,7 @@
             </div>
           </form>
         </div>
-        
+
         <div class="modal-footer">
           <button class="cancel-btn" @click="showAddJobModal = false">取消</button>
           <button class="confirm-btn" @click="confirmAddJob">发布岗位</button>
@@ -580,14 +654,14 @@
           <h3>{{ actionModalTitle }}</h3>
           <button class="close-modal" @click="showActionModal = false">×</button>
         </div>
-        
+
         <div class="modal-body">
           <p class="action-message">{{ actionModalMessage }}</p>
           <div class="action-confirm" v-if="actionModalConfirm">
             <p class="confirm-text">{{ actionModalConfirmText }}</p>
           </div>
         </div>
-        
+
         <div class="modal-footer">
           <button class="cancel-btn" @click="showActionModal = false" v-if="actionModalShowCancel">取消</button>
           <button class="confirm-btn" @click="confirmAction">{{ actionModalBtnText }}</button>
@@ -596,7 +670,7 @@
     </div>
 
     <!-- 成功提示  v-if="showToast" -->
-    <div class="toast" v-if="showToast" >
+    <div class="toast" v-if="showToast">
       <div class="toast-content" :class="toastType">
         <span class="toast-icon">{{ toastType === 'success' ? '✓' : toastType === 'error' ? '!' : 'ℹ' }}</span>
         <div class="toast-message">
@@ -612,17 +686,19 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import eventBus from '../../utils/eventBus'; // 导入事件总线
-import { 
-  updateMembershipLevel, 
+import {
+  updateMembershipLevel,
   getUserMembership,
-  getMembershipDisplayName 
+  getMembershipDisplayName,
+  registerUser, // 导入注册方法
+  checkUsernameExists // 导入用户名检查方法
 } from '../../utils/userStorage'; // 导入用户存储工具
 
 const router = useRouter();
 
 // 当前用户信息
 const currentUser = ref(JSON.parse(localStorage.getItem('currentUser')));
-const currentMembership = ref('regular'); // 默认普通会员
+const currentMembership = ref('regular'); // 默认普通用户（移除non_member状态）
 
 // 会员数据
 const memberStats = ref({
@@ -642,6 +718,7 @@ const showToast = ref(false);
 // 表单数据
 const joinForm = ref({
   username: '',
+  role: 'user', // 默认普通用户角色
   phone: '',
   code: '',
   password: ''
@@ -675,52 +752,61 @@ const getMembershipText = (level) => {
   return getMembershipDisplayName(level);
 };
 
-// 会员套餐配置
+// 会员套餐配置（移除non_member，普通用户为基础等级）
 const membershipPlans = ref([
   {
     level: 'regular',
-    title: '普通会员',
+    title: '普通用户',
     price: '¥0',
     period: '/永久',
     features: [
       '基础智能购物分析',
       '9.5折专属折扣',
       '1小时免费停车',
-      '生日基础礼遇'
+      '生日基础礼遇',
+      '兼职岗位发布（商家）'
     ]
   },
   {
     level: 'silver',
     title: '白银会员',
-    price: '¥68',
+    price: '¥49.9',
     period: '/月',
     features: [
-      '所有普通会员权益',
+      '所有普通用户权益',
       '9折专属折扣',
       '2小时免费停车',
       '生日进阶礼遇',
-      '消费数据分析报告'
+      '消费数据分析报告',
+      '服务类目热力图',
+      '岗位置顶权限（商家）',
+      '优化广告展示位置（商家）'
     ]
   },
   {
     level: 'gold',
     title: '黄金会员',
-    price: '¥198',
+    price: '¥99.9',
     period: '/月',
     features: [
       '所有白银会员权益',
       '8.5折专属折扣',
       '3小时免费停车',
-      'AI智能洞察分析',
-      '竞争对手对比分析',
-      '兼职岗位管理',
-      '专属客服服务'
+      'AI智能洞察分析（基础）',
+      '竞争对手对比分析（基础）',
+      '兼职岗位管理（商家）',
+      '专属客服服务',
+      '工单处理效率分析',
+      '用户满意度分析',
+      '自定义报表导出',
+      '多形式广告展示（商家）',
+      '30次/日曝光提升（商家）'
     ]
   },
   {
     level: 'diamond',
     title: '钻石会员',
-    price: '¥398',
+    price: '¥199.9',
     period: '/月',
     features: [
       '所有黄金会员权益',
@@ -729,15 +815,19 @@ const membershipPlans = ref([
       '详细AI洞察报告',
       '定制化分析方案',
       '专属客户经理',
-      '新品优先购特权'
+      '新品优先购特权',
+      '多门店数据对比',
+      '经营预测模型',
+      '顶级岗位推荐位（商家）',
+      '定制化营销方案（商家）'
     ]
   }
 ]);
 
 // 升级选项（显示所有更高等级的选项）
 const upgradeOptions = computed(() => {
-  const levelOrder = { 'non_member': 0, 'regular': 1, 'silver': 2, 'gold': 3, 'diamond': 4 };
-  
+  const levelOrder = { 'regular': 1, 'silver': 2, 'gold': 3, 'diamond': 4 }; // 移除non_member
+
   return membershipPlans.value
     .filter((plan) => levelOrder[plan.level] > levelOrder[currentMembership.value])
     .map(plan => {
@@ -755,10 +845,7 @@ let statsUpdateTimer = null;
 
 onMounted(() => {
   // 检查用户是否登录
-  if (!currentUser.value) {
-    // 如果没有登录，设置为非会员
-    currentMembership.value = 'non_member';
-  } else {
+  if (currentUser.value) {
     // 优先从localStorage获取会员状态
     const savedMembership = localStorage.getItem('userMembership');
     if (savedMembership) {
@@ -775,7 +862,7 @@ onMounted(() => {
       }
     }
   }
-  
+
   // 每5秒更新一次数据
   statsUpdateTimer = setInterval(() => {
     memberStats.value = {
@@ -784,15 +871,15 @@ onMounted(() => {
       satisfaction: Number((memberStats.value.satisfaction + (Math.random() * 0.2 - 0.1)).toFixed(1))
     };
   }, 5000);
-  
+
   // 监听会员状态更新事件
   const handleMembershipUpdate = (newLevel) => {
     currentMembership.value = newLevel;
     showToastNotification('更新成功', `会员等级已更新为${getMembershipText(newLevel)}`, 'success');
   };
-  
+
   eventBus.on('membershipUpdated', handleMembershipUpdate);
-  
+
   // 组件卸载时移除监听
   onUnmounted(() => {
     if (statsUpdateTimer) clearInterval(statsUpdateTimer);
@@ -806,7 +893,7 @@ const showToastNotification = (title, message, type = 'success') => {
   toastMessage.value = message;
   toastType.value = type;
   showToast.value = true;
-  
+
   setTimeout(() => {
     showToast.value = false;
   }, 3000);
@@ -841,32 +928,49 @@ const sendCode = () => {
   showToastNotification('成功', '验证码已发送，请注意查收', 'success');
 };
 
-// 确认注册
+// 确认注册（使用userStorage中的registerUser方法）
 const confirmJoin = () => {
-  if (!joinForm.value.username || !joinForm.value.phone || !joinForm.value.code || !joinForm.value.password) {
+  if (!joinForm.value.username || !joinForm.value.role || !joinForm.value.phone || !joinForm.value.code || !joinForm.value.password) {
     showToastNotification('提示', '请填写完整信息', 'error');
     return;
   }
-  
-  // 模拟注册成功（实际项目中应调用registerUser方法）
-  const newUser = {
+
+  // 检查用户名是否已存在
+  const usernameExists = checkUsernameExists(joinForm.value.username, joinForm.value.role);
+  if (usernameExists) {
+    showToastNotification('提示', '该用户名已被注册', 'error');
+    return;
+  }
+
+  // 调用注册方法
+  const registerResult = registerUser({
     username: joinForm.value.username,
-    phone: joinForm.value.phone,
-    role: 'user', // 默认用户角色
-    membershipLevel: 'regular'
-  };
-  
-  localStorage.setItem('currentUser', JSON.stringify(newUser));
-  localStorage.setItem('userMembership', 'regular');
-  
-  currentUser.value = newUser;
-  currentMembership.value = 'regular';
-  
-  showJoinModal.value = false;
-  showToastNotification('注册成功', '恭喜您成为普通会员！', 'success');
-  
-  // 通知其他组件
-  eventBus.emit('membershipUpdated', 'regular');
+    password: joinForm.value.password,
+    role: joinForm.value.role
+  });
+
+  if (registerResult.success) {
+    // 注册成功，创建用户信息
+    const newUser = {
+      username: joinForm.value.username,
+      role: joinForm.value.role,
+      membershipLevel: 'regular' // 注册默认普通用户
+    };
+
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    localStorage.setItem('userMembership', 'regular');
+
+    currentUser.value = newUser;
+    currentMembership.value = 'regular';
+
+    showJoinModal.value = false;
+    showToastNotification('注册成功', `恭喜您成为${joinForm.value.role === 'merchant' ? '商家' : '普通'}用户！`, 'success');
+
+    // 通知其他组件
+    eventBus.emit('membershipUpdated', 'regular');
+  } else {
+    showToastNotification('注册失败', registerResult.message, 'error');
+  }
 };
 
 // 选择套餐
@@ -875,7 +979,7 @@ const selectPlan = (level) => {
     showJoinModal.value = true;
     return;
   }
-  
+
   selectedUpgradeLevel.value = level;
   showUpgradeModal.value = true;
 };
@@ -883,33 +987,33 @@ const selectPlan = (level) => {
 // 确认升级
 const confirmUpgrade = () => {
   if (!selectedUpgradeLevel.value || !currentUser.value) return;
-  
+
   // 调用用户存储工具更新会员等级
   const result = updateMembershipLevel(
     currentUser.value.username,
     currentUser.value.role,
     selectedUpgradeLevel.value
   );
-  
+
   if (result.success) {
     // 更新当前会员状态
     currentMembership.value = selectedUpgradeLevel.value;
-    
+
     // 更新localStorage中的用户信息
     currentUser.value.membershipLevel = selectedUpgradeLevel.value;
     localStorage.setItem('currentUser', JSON.stringify(currentUser.value));
     localStorage.setItem('userMembership', selectedUpgradeLevel.value);
-    
+
     // 通知其他组件更新会员状态
     eventBus.emit('membershipUpdated', selectedUpgradeLevel.value);
-    
+
     // 显示成功提示
     showToastNotification(
       '升级成功',
       `恭喜您已成功升级为${getMembershipText(selectedUpgradeLevel.value)}`,
       'success'
     );
-    
+
     // 关闭弹窗
     showUpgradeModal.value = false;
     selectedUpgradeLevel.value = '';
@@ -929,10 +1033,10 @@ const confirmAddJob = () => {
     showToastNotification('提示', '请填写岗位名称和薪资', 'error');
     return;
   }
-  
+
   showAddJobModal.value = false;
   showToastNotification('发布成功', '岗位已成功发布', 'success');
-  
+
   // 重置表单
   jobForm.value = {
     name: '',
@@ -963,9 +1067,9 @@ const generateMoreInsights = () => {
     showToastNotification('权限不足', '需要升级至黄金会员才能使用此功能', 'error');
     return;
   }
-  
+
   showToastNotification('处理中', '正在为您生成更多AI洞察...', 'info');
-  
+
   setTimeout(() => {
     showToastNotification('完成', '新的AI洞察已生成，请查看', 'success');
   }, 2000);
@@ -974,7 +1078,7 @@ const generateMoreInsights = () => {
 // 导出报告
 const exportReport = () => {
   showToastNotification('导出中', '报告正在生成，即将下载...', 'info');
-  
+
   setTimeout(() => {
     showToastNotification('导出成功', '竞争对手分析报告已导出', 'success');
   }, 1500);
@@ -999,7 +1103,7 @@ const handleComparisonChange = (event) => {
 
 /* 头部样式 */
 .header {
-    background-color: white;
+  background-color: white;
 
   text-align: center;
   padding: 40px 20px;
@@ -1024,7 +1128,8 @@ const handleComparisonChange = (event) => {
   justify-content: center;
 }
 
-.join-btn, .upgrade-btn {
+.join-btn,
+.upgrade-btn {
   padding: 12px 24px;
   border: none;
   border-radius: 30px;
@@ -1050,9 +1155,10 @@ const handleComparisonChange = (event) => {
   cursor: not-allowed;
 }
 
-.join-btn:hover, .upgrade-btn:hover:not(.disabled) {
+.join-btn:hover,
+.upgrade-btn:hover:not(.disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .current-membership-status {
@@ -1076,10 +1182,25 @@ const handleComparisonChange = (event) => {
   font-weight: bold;
 }
 
-.badge-regular { background-color: #e0e0e0; color: #333; }
-.badge-silver { background-color: #c0c0c0; color: #333; }
-.badge-gold { background-color: #ffd700; color: #333; }
-.badge-diamond { background-color: #b9f2ff; color: #0077b6; }
+.badge-regular {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.badge-silver {
+  background-color: #c0c0c0;
+  color: #333;
+}
+
+.badge-gold {
+  background-color: #ffd700;
+  color: #333;
+}
+
+.badge-diamond {
+  background-color: #b9f2ff;
+  color: #0077b6;
+}
 
 /* 会员等级概览 */
 .membership-overview {
@@ -1105,7 +1226,7 @@ const handleComparisonChange = (event) => {
   border-radius: 10px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   border-top: 3px solid #667eea;
 }
@@ -1147,11 +1268,12 @@ const handleComparisonChange = (event) => {
   margin-bottom: 40px;
 }
 
-.ai-intelligence, .competitor-analysis {
+.ai-intelligence,
+.competitor-analysis {
   background: white;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
 }
 
 .section-header {
@@ -1235,7 +1357,7 @@ const handleComparisonChange = (event) => {
   padding: 15px;
   margin-bottom: 15px;
   border-left: 4px solid #667eea;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .traffic-card {
@@ -1428,7 +1550,7 @@ const handleComparisonChange = (event) => {
   background: white;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
   margin-bottom: 40px;
 }
 
@@ -1601,7 +1723,7 @@ const handleComparisonChange = (event) => {
   background-color: white;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
 }
 
 .table-header {
@@ -1668,7 +1790,7 @@ const handleComparisonChange = (event) => {
   border-radius: 10px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   border-top: 4px solid #667eea;
 }
 
@@ -1707,7 +1829,7 @@ const handleComparisonChange = (event) => {
   background: white;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
   position: relative;
 }
@@ -1734,7 +1856,7 @@ const handleComparisonChange = (event) => {
   padding: 5px 30px;
   font-weight: bold;
   transform: rotate(45deg);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .plan-header {
@@ -1831,14 +1953,17 @@ const handleComparisonChange = (event) => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-.join-modal, .upgrade-modal, .add-job-modal, .action-modal {
+.join-modal,
+.upgrade-modal,
+.add-job-modal,
+.action-modal {
   background-color: white;
   border-radius: 10px;
   width: 90%;
@@ -1890,7 +2015,8 @@ const handleComparisonChange = (event) => {
   cursor: pointer;
 }
 
-.confirm-btn, .confirm-upgrade-btn {
+.confirm-btn,
+.confirm-upgrade-btn {
   padding: 8px 16px;
   background-color: #667eea;
   color: white;
@@ -1905,7 +2031,8 @@ const handleComparisonChange = (event) => {
 }
 
 /* 表单样式 */
-.join-form, .job-form {
+.join-form,
+.job-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -1922,7 +2049,9 @@ const handleComparisonChange = (event) => {
   font-size: 0.9rem;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input,
+.form-group select,
+.form-group textarea {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -2036,7 +2165,7 @@ const handleComparisonChange = (event) => {
   display: flex;
   align-items: center;
   gap: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   min-width: 300px;
 }
 
@@ -2084,11 +2213,11 @@ const handleComparisonChange = (event) => {
   .intelligence-container {
     grid-template-columns: 1fr;
   }
-  
+
   .plan-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .plan-card.featured {
     transform: none;
   }
@@ -2098,25 +2227,27 @@ const handleComparisonChange = (event) => {
   .header h1 {
     font-size: 2rem;
   }
-  
+
   .current-membership-status {
     position: static;
     margin-bottom: 15px;
     justify-content: center;
   }
-  
-  .table-header, .table-row {
+
+  .table-header,
+  .table-row {
     grid-template-columns: 2fr repeat(2, 1fr);
   }
-  
+
   .table-cell:nth-child(n+4) {
     display: none;
   }
-  
-  .jobs-table-header, .job-row {
+
+  .jobs-table-header,
+  .job-row {
     grid-template-columns: 2fr 1fr 1fr;
   }
-  
+
   .job-row .table-col:nth-child(n+4) {
     display: none;
   }
@@ -2127,1027 +2258,41 @@ const handleComparisonChange = (event) => {
     flex-direction: column;
     align-items: center;
   }
-  
-  .join-btn, .upgrade-btn {
+
+  .join-btn,
+  .upgrade-btn {
     width: 100%;
     max-width: 250px;
   }
-  
+
   .level-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .metrics-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
-  .table-header, .table-row {
+
+  .table-header,
+  .table-row {
     grid-template-columns: 1fr;
   }
-  
+
   .table-cell:nth-child(n+2) {
     display: none;
   }
-  
-  .jobs-table-header, .job-row {
+
+  .jobs-table-header,
+  .job-row {
     grid-template-columns: 1fr;
   }
-  
+
   .job-row .table-col:nth-child(n+2) {
     display: none;
   }
 }
 </style>
-<!-- 
-<style scoped>
-/* 基础样式保持与服务页面一致 */
-.slide {
-  flex: 0 0 100%;
-  position: relative;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.slide-bg {
-  width: 100%;
-  height: 100%;
-  transition: transform 8s ease;
-}
-
-.slide-core-value .slide-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.tech-decoration {
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  filter: blur(100px);
-  z-index: 1;
-}
-
-.tech-decoration.left {
-  top: 30%;
-  left: -100px;
-  background: rgba(50, 150, 255, 0.2);
-}
-
-.tech-decoration.right {
-  bottom: -50px;
-  right: 10%;
-  background: rgba(100, 200, 255, 0.15);
-}
-
-.slide-content {
-  height: 740px;
-  position: absolute;
-  top: 43%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #333; /* 改为深色以适应白色背景 */
-  width: 90%;
-  max-width: 1600px;
-  padding: 20px;
-  z-index: 2;
-  opacity: 0;
-  animation: fadeIn 1.2s forwards 0.3s;
-  overflow-y: auto;
-  scrollbar-width: 6px;
-  scrollbar-color: rgba(50, 150, 255, 0.5) transparent;
-}
-
-.slide-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.slide-content::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.slide-content::-webkit-scrollbar-thumb {
-  background-color: rgba(50, 150, 255, 0.5);
-  border-radius: 3px;
-  transition: background-color 0.3s;
-}
-
-.slide-content::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(50, 150, 255, 0.8);
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
-
-.membership-page {
-  color: #333; /* 深色文字 */
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-/* 新增：AI智能洞察与竞争对手分析容器样式 */
-.intelligence-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  margin-bottom: 40px;
-  padding: 0 20px;
-}
-
-@media (max-width: 1024px) {
-  .intelligence-container {
-    grid-template-columns: 1fr;
-  }
-}
-
-.ai-intelligence, .competitor-analysis {
-  background: #f8f9fa;
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 10px;
-}
-
-.section-header h2 {
-  color: #2c3e50;
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.badges {
-  display: flex;
-  gap: 10px;
-}
-
-.badge {
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.gold-badge {
-  background-color: rgba(255, 183, 77, 0.2);
-  color: #f57c00;
-  border: 1px solid rgba(255, 183, 77, 0.3);
-}
-
-.ai-badge {
-  background-color: rgba(79, 195, 247, 0.2);
-  color: #2196f3;
-  border: 1px solid rgba(79, 195, 247, 0.3);
-}
-
-.action-buttons {
-  display: flex;
-  gap: 15px;
-}
-
-.comparison-select {
-  background-color: #fff;
-  color: #333;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.comparison-select option {
-  background-color: #fff;
-  color: #333;
-}
-
-.export-btn {
-  background-color: #f1f3f5;
-  color: #495057;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.3s;
-}
-
-.export-btn:hover {
-  background-color: #e9ecef;
-}
-
-.insight-card {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-left: 3px solid transparent;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.traffic-card {
-  border-left-color: #42a5f5;
-}
-
-.service-card {
-  border-left-color: #66bb6a;
-}
-
-.customer-card {
-  border-left-color: #ffa726;
-}
-
-.premium-card {
-  background-color: #f3e5f5;
-  border: 1px dashed #ce93d8;
-  text-align: center;
-  padding: 20px 15px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.card-icon {
-  font-size: 1.2rem;
-}
-
-.tag {
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.suggestion-tag {
-  background-color: rgba(66, 165, 245, 0.2);
-  color: #1976d2;
-}
-
-.flow-tag {
-  background-color: rgba(102, 187, 106, 0.2);
-  color: #388e3c;
-}
-
-.marketing-tag {
-  background-color: rgba(255, 167, 38, 0.2);
-  color: #f57c00;
-}
-
-.card-content p {
-  margin: 0 0 10px 0;
-  color: #495057;
-  font-size: 0.95rem;
-}
-
-.premium-info {
-  font-size: 0.85rem !important;
-  color: #8e24aa !important;
-  margin-bottom: 0 !important;
-}
-
-.generate-more-btn {
-  background: linear-gradient(to right, #9c27b0, #ba68c8);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 20px;
-  margin-top: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  transition: all 0.3s;
-}
-
-.generate-more-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(156, 39, 176, 0.3);
-}
-
-.metrics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.metric-card {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 15px;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.metric-card p:first-child {
-  margin: 0 0 5px 0;
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-.metric-value {
-  margin: 0;
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.traffic-metric .metric-value {
-  color: #43a047;
-}
-
-.satisfaction-metric .metric-value {
-  color: #e53935;
-}
-
-.conversion-metric .metric-value {
-  color: #43a047;
-}
-
-.awareness-metric .metric-value {
-  color: #e53935;
-}
-
-.analysis-content h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  color: #2c3e50;
-  font-size: 1.1rem;
-}
-
-.analysis-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.analysis-list li {
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.strength {
-  background-color: rgba(102, 187, 106, 0.1);
-  border-left: 3px solid #43a047;
-}
-
-.weakness {
-  background-color: rgba(239, 83, 80, 0.1);
-  border-left: 3px solid #e53935;
-}
-
-.indicator {
-  font-weight: bold;
-  margin-top: 2px;
-}
-
-.strength .indicator {
-  color: #43a047;
-}
-
-.weakness .indicator {
-  color: #e53935;
-}
-
-.analysis-list p {
-  margin: 0;
-  font-size: 0.95rem;
-  color: #495057;
-}
-
-/* 新增：兼职岗位管理样式 */
-.part-time-jobs {
-  margin-bottom: 40px;
-  padding: 0 20px;
-}
-
-.jobs-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.jobs-header h2 {
-  color: #2c3e50;
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.jobs-actions {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.add-job-btn {
-  background-color: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.add-job-btn:hover {
-  background-color: #1976d2;
-}
-
-.job-filter {
-  background-color: #fff;
-  color: #333;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.jobs-table {
-  width: 100%;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  border: 1px solid #e9ecef;
-}
-
-.jobs-table-header {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.table-col {
-  padding: 15px;
-  font-weight: 500;
-  color: #495057;
-}
-
-.job-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-  border-bottom: 1px solid #e9ecef;
-  background-color: #fff;
-  transition: background-color 0.2s;
-}
-
-.job-row:hover {
-  background-color: #f8f9fa;
-}
-
-.job-row.highlighted {
-  background-color: #fff8e1;
-}
-
-.job-status .status {
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.status.active {
-  background-color: rgba(76, 175, 80, 0.15);
-  color: #2e7d32;
-}
-
-.status.paused {
-  background-color: rgba(255, 152, 0, 0.15);
-  color: #ef6c00;
-}
-
-.job-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.action-btn {
-  background: none;
-  border: none;
-  border-radius: 4px;
-  padding: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.action-btn:hover {
-  background-color: #e9ecef;
-}
-
-.edit-btn {
-  color: #2196f3;
-}
-
-.delete-btn {
-  color: #e53935;
-}
-
-.job-recommendations {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-}
-
-.recommendation-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.recommendation-tags .tag {
-  background-color: #e9ecef;
-  color: #495057;
-  padding: 4px 10px;
-}
-
-.recommendation-tags .highlight-tag {
-  background-color: #fff3e0;
-  color: #e65100;
-  border: 1px solid #ffe0b2;
-}
-
-.more-jobs-btn {
-  background-color: #e9ecef;
-  color: #495057;
-  border: none;
-  border-radius: 5px;
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.more-jobs-btn:hover {
-  background-color: #dee2e6;
-}
-
-/* 头部样式保持一致 */
-.header {
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 0 20px;
-}
-
-.header h1 {
-  font-size: 2.2rem;
-  margin-bottom: 15px;
-  color: #2c3e50;
-}
-
-.header p {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  background: #e3f2fd;
-  color: #1565c0;
-  padding: 12px 24px;
-  border-radius: 20px;
-  display: inline-block;
-}
-
-.btn-group {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.join-btn, .upgrade-btn, .subscribe-btn, .contact-btn {
-  background: linear-gradient(to right, #2196f3, #1976d2);
-  color: #fff;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 24px;
-  font-size: 1.05rem;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.join-btn:hover, .upgrade-btn:hover, .subscribe-btn:hover, .contact-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
-}
-
-/* 会员等级概览 */
-.membership-overview {
-  margin-bottom: 35px;
-  padding: 0 20px;
-}
-
-.membership-overview h3 {
-  font-size: 1.5rem;
-  margin-bottom: 18px;
-  color: #2c3e50;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 10px;
-}
-
-.level-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-}
-
-.level-item {
-  background: #f8f9fa;
-  padding: 20px 15px;
-  border-radius: 10px;
-  text-align: center;
-  border: 1px solid #e9ecef;
-  transition: transform 0.3s ease;
-}
-
-.level-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-.level-item.featured {
-  background: #fff8e1;
-  border: 1px solid #ffe0b2;
-}
-
-.level-icon {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
-}
-
-.level-item h4 {
-  margin: 0 0 8px 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
-}
-
-.level-item p {
-  margin: 0;
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-/* 权益对比表 */
-.benefits-comparison {
-  margin-bottom: 35px;
-  padding: 0 20px;
-}
-
-.benefits-comparison h3 {
-  font-size: 1.5rem;
-  margin-bottom: 18px;
-  color: #2c3e50;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 10px;
-}
-
-.comparison-table {
-  width: 100%;
-  background: #f8f9fa;
-  border-radius: 10px;
-  border: 1px solid #e9ecef;
-  overflow: hidden;
-}
-
-.table-header {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-  background: #e9ecef;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.table-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-  border-bottom: 1px solid #e9ecef;
-  background-color: #fff;
-  transition: background 0.3s;
-}
-
-.table-row:hover {
-  background: #f8f9fa;
-}
-
-.table-cell {
-  padding: 15px;
-  text-align: center;
-  position: relative;
-  color: #495057;
-}
-
-.table-cell:first-child {
-  text-align: left;
-  font-weight: 500;
-  padding-left: 25px;
-}
-
-.check {
-  color: #43a047;
-  font-weight: bold;
-}
-
-.cross {
-  color: #e53935;
-  font-weight: bold;
-}
-
-/* 会员数据统计 */
-.membership-stats {
-  margin-bottom: 35px;
-  padding: 0 20px;
-}
-
-.membership-stats h3 {
-  font-size: 1.5rem;
-  margin-bottom: 18px;
-  color: #2c3e50;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 10px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
-}
-
-.stat-card {
-  background: #f8f9fa;
-  padding: 20px 15px;
-  border-radius: 10px;
-  text-align: center;
-  border: 1px solid #e9ecef;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(to right, #2196f3, #1976d2);
-}
-
-.stat-value {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #2c3e50;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-/* 会员套餐卡片 */
-.membership-plans {
-  margin-bottom: 35px;
-  padding: 0 20px;
-}
-
-.membership-plans h3 {
-  font-size: 1.5rem;
-  margin-bottom: 18px;
-  color: #2c3e50;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 10px;
-}
-
-.plan-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-}
-
-.plan-card {
-  background: #f8f9fa;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid #e9ecef;
-  transition: all 0.3s;
-  position: relative;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.plan-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-  border-color: #dee2e6;
-}
-
-.plan-card.featured {
-  transform: scale(1.05);
-  border-color: #ffcc80;
-  background-color: #fff8e1;
-}
-
-.featured-badge {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ffb74d;
-  color: #e65100;
-  padding: 3px 20px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
-  box-shadow: 0 2px 10px rgba(255, 183, 77, 0.3);
-}
-
-.plan-header {
-  padding: 30px 20px;
-  border-bottom: 1px solid #e9ecef;
-  text-align: center;
-}
-.phhj{
-  position: relative;
-  top: 30px;
-}
-
-.plan-header h4 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  margin-top: 0;
-  color: #2c3e50;
-}
-
-.plan-price {
-  font-size: 32px;
-  font-weight: 800;
-  color: #1976d2;
-}
-
-.plan-price span {
-  font-size: 16px;
-  font-weight: normal;
-  color: #6c757d;
-}
-
-.plan-features {
-  padding: 25px 20px;
-}
-
-.plan-features ul {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 30px 0;
-}
-
-.plan-features li {
-  padding: 10px 0;
-  border-bottom: 1px solid #e9ecef;
-  display: flex;
-  align-items: center;
-  color: #495057;
-}
-
-.plan-features li:before {
-  content: "✓";
-  color: #43a047;
-  margin-right: 10px;
-}
-
-.subscribe-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.plan-card.featured .subscribe-btn {
-  background: linear-gradient(45deg, #ffb74d, #ffa726);
-  color: #e65100;
-  box-shadow: 0 4px 15px rgba(255, 183, 77, 0.3);
-}
-
-.plan-card.featured .subscribe-btn:hover {
-  background: linear-gradient(45deg, #ffa726, #ff9800);
-  box-shadow: 0 6px 20px rgba(255, 183, 77, 0.5);
-}
-
-/* 响应式调整 */
-@media (max-width: 1024px) {
-  .header h1 {
-    font-size: 1.9rem;
-  }
-
-  .level-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .plan-cards {
-    grid-template-columns: 1fr;
-  }
-  
-  .plan-card.featured {
-    transform: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .table-header, .table-row {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .table-header .table-cell:nth-child(n+3),
-  .table-row .table-cell:nth-child(n+3) {
-    display: none;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .jobs-table-header, .job-row {
-    grid-template-columns: 2fr 1fr 1fr;
-  }
-  
-  .jobs-table-header .table-col:nth-child(n+4),
-  .job-row .table-col:nth-child(n+4) {
-    display: none;
-  }
-
-  .header h1 {
-    font-size: 1.6rem;
-  }
-
-  .header p {
-    font-size: 1rem;
-    padding: 10px 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .level-grid,
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .btn-group {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .join-btn, .upgrade-btn {
-    width: 100%;
-    max-width: 250px;
-  }
-
-  .table-header, .table-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .table-header .table-cell:nth-child(n+2),
-  .table-row .table-cell:nth-child(n+2) {
-    display: none;
-  }
-
-  .jobs-table-header, .job-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .jobs-table-header .table-col:nth-child(n+2),
-  .job-row .table-col:nth-child(n+2) {
-    display: none;
-  }
-}
-</style> -->

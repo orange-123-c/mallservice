@@ -12,28 +12,32 @@ function initUsers() {
       merchant: []  // 商家账户
     }));
   } else {
-    // 为现有用户添加会员状态（向后兼容）
+    // 为现有用户更新会员状态（向后兼容）
     const users = JSON.parse(localStorage.getItem(STORAGE_KEY));
     let updated = false;
     
-    // 为user角色用户添加会员状态
+    // 为user角色用户更新会员状态
     if (users.user) {
       users.user = users.user.map(user => {
-        if (!user.hasOwnProperty('membershipLevel')) {
+        // 处理原非会员，设置为普通用户
+        if (!user.hasOwnProperty('membershipLevel') || user.membershipLevel === 'non_member') {
           updated = true;
-          return { ...user, membershipLevel: 'non_member' };
+          return { ...user, membershipLevel: 'regular' };
         }
+        // 保持其他等级不变
         return user;
       });
     }
     
-    // 为merchant角色用户添加会员状态
+    // 为merchant角色用户更新会员状态
     if (users.merchant) {
       users.merchant = users.merchant.map(user => {
-        if (!user.hasOwnProperty('membershipLevel')) {
+        // 处理原非会员，设置为普通用户
+        if (!user.hasOwnProperty('membershipLevel') || user.membershipLevel === 'non_member') {
           updated = true;
-          return { ...user, membershipLevel: 'non_member' };
+          return { ...user, membershipLevel: 'regular' };
         }
+        // 保持其他等级不变
         return user;
       });
     }
@@ -62,12 +66,12 @@ export function registerUser(userData) {
     return { success: false, message: '用户名已存在' };
   }
   
-  // 添加新用户（默认非会员）
+  // 添加新用户（默认普通用户）
   roleUsers.push({
     username: userData.username,
     password: userData.password,
     createdAt: new Date().toISOString(),
-    membershipLevel: 'non_member' // 默认非会员
+    membershipLevel: 'regular' // 默认普通用户
   });
   
   users[userData.role] = roleUsers;
@@ -122,8 +126,8 @@ export function resetUserPassword(username, newPassword, role) {
 
 // 更新会员等级
 export function updateMembershipLevel(username, role, newLevel) {
-  // 验证会员等级是否有效
-  const validLevels = ['non_member', 'regular', 'silver', 'gold', 'diamond'];
+  // 验证会员等级是否有效（仅保留普通用户和三个会员等级）
+  const validLevels = ['regular', 'silver', 'gold', 'diamond'];
   if (!validLevels.includes(newLevel)) {
     return { success: false, message: '无效的会员等级' };
   }
@@ -167,12 +171,11 @@ export function getUserMembership(username, role) {
 // 获取会员等级的中文显示名称
 export function getMembershipDisplayName(level) {
   const displayNames = {
-    'non_member': '非会员',
-    'regular': '普通会员',
+    'regular': '普通用户',    // 原普通会员改为普通用户
     'silver': '白银会员',
     'gold': '黄金会员',
     'diamond': '钻石会员'
   };
   
-  return displayNames[level] || '非会员';
+  return displayNames[level] || '普通用户';  // 默认返回普通用户
 }

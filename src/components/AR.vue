@@ -1,5 +1,5 @@
 <template>
-  <div class="ar-mall-navigation">
+ <div class="ar-mall-navigation">
     <!-- 商场选择弹窗 -->
     <div class="mall-selector-modal" v-if="showMallSelector">
       <div class="modal-content">
@@ -435,7 +435,6 @@
         
         <div class="shops-grid">
           <div class="shop-card" v-for="shop in filteredAndSortedShops" :key="shop.id">
-            <div class="card-badge" v-if="shop.promotion">{{ shop.promotion }}</div>
             <img :src="shop.image" alt="店铺图片" class="shop-image">
             <div class="shop-rating" :style="{width: (shop.rating * 20) + '%'}">
               <div class="stars">★★★★★</div>
@@ -1397,7 +1396,7 @@ onUnmounted(() => {
 .ar-mall-navigation {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   background-color: #0f172a;
   color: #f8fafc;
   overflow: hidden;

@@ -33,7 +33,7 @@
               v-if="currentMembership !== 'diamond'" 
               class="upgrade-btn primary-btn"
               @click="showUpgradeModal = true">
-              立即升级会员
+              {{ currentMembership === 'regular' ? '升级至付费会员' : '立即升级会员' }}
             </button>
             <button 
               v-else 
@@ -53,23 +53,20 @@
       <div class="container">
         <h2 class="section-title">会员权益详情</h2>
         
-        <div class="benefits-table">
-          <div class="benefits-header">
-            <div class="benefit-item header-item">会员权益</div>
-            <div class="benefit-item header-item">非会员</div>
-            <div class="benefit-item header-item">普通会员</div>
-            <div class="benefit-item header-item">白银会员</div>
-            <div class="benefit-item header-item">黄金会员</div>
-            <div class="benefit-item header-item">钻石会员</div>
-          </div>
-          
-          <div class="benefits-row" v-for="(benefit, index) in membershipBenefits" :key="index">
-            <div class="benefit-item">{{ benefit.name }}</div>
-            <div class="benefit-item" :class="getBenefitClass(benefit.non_member)">{{ getBenefitIcon(benefit.non_member) }}</div>
-            <div class="benefit-item" :class="getBenefitClass(benefit.regular)">{{ getBenefitIcon(benefit.regular) }}</div>
-            <div class="benefit-item" :class="getBenefitClass(benefit.silver)">{{ getBenefitIcon(benefit.silver) }}</div>
-            <div class="benefit-item" :class="getBenefitClass(benefit.gold)">{{ getBenefitIcon(benefit.gold) }}</div>
-            <div class="benefit-item" :class="getBenefitClass(benefit.diamond)">{{ getBenefitIcon(benefit.diamond) }}</div>
+        <!-- 修改：使用卡片式布局替代表格 -->
+        <div class="benefits-cards">
+          <div class="benefit-card" v-for="(level, index) in ['regular', 'silver', 'gold', 'diamond']" :key="index">
+            <div class="benefit-card-header" :class="`header-${level}`">
+              <h3>{{ getMembershipText(level) }}</h3>
+            </div>
+            <div class="benefit-card-body">
+              <div class="benefit-item" v-for="(benefit, i) in membershipBenefits" :key="i">
+                <div class="benefit-name">{{ benefit.name }}</div>
+                <div class="benefit-value" :class="getBenefitClass(benefit[level])">
+                  {{ getBenefitIcon(benefit[level]) }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -86,7 +83,7 @@
               <h3 class="plan-title">{{ plan.title }}</h3>
               <div class="plan-price">
                 <span class="price">{{ plan.price }}</span>
-                <span class="period">{{ plan.period }}</span>
+                <span class="period" v-if="plan.period">{{ plan.period }}</span>
               </div>
             </div>
             
@@ -103,7 +100,8 @@
               <button 
                 v-if="currentMembership !== plan.level"
                 class="select-plan-btn"
-                @click="selectPlan(plan.level)">
+                @click="selectPlan(plan.level)"
+                :class="{ 'free-action': plan.price === '免费' }">
                 {{ getPlanButtonText(plan.level) }}
               </button>
               <span v-else class="current-plan-tag">当前套餐</span>
@@ -113,16 +111,27 @@
       </div>
     </div>
 
-    <!-- 升级会员弹窗 -->
+    <!-- 升级/降级会员弹窗 -->
     <div class="modal-overlay" v-if="showUpgradeModal">
       <div class="upgrade-modal">
         <div class="modal-header">
-          <h3>升级会员</h3>
+          <h3>{{ isDowngradeToRegular ? '降级确认' : '升级会员' }}</h3>
           <button class="close-modal" @click="showUpgradeModal = false">×</button>
         </div>
         
         <div class="modal-body">
-          <div class="upgrade-options">
+          <!-- 修改：降级到普通用户时显示不同内容 -->
+          <div v-if="isDowngradeToRegular" class="downgrade-warning">
+            <div class="warning-icon">⚠️</div>
+            <h4>您确定要降级为普通用户吗？</h4>
+            <p>降级后您将失去以下会员权益：</p>
+            <ul class="downgrade-losses">
+              <li v-for="(loss, i) in downgradeLosses" :key="i">{{ loss }}</li>
+            </ul>
+            <p class="downgrade-note">此操作不可逆，请谨慎选择！</p>
+          </div>
+          
+          <div v-else class="upgrade-options">
             <div 
               class="upgrade-option" 
               v-for="(option, index) in upgradeOptions" 
@@ -144,8 +153,8 @@
           <button 
             class="confirm-upgrade-btn" 
             @click="confirmUpgrade"
-            :disabled="!selectedUpgradeLevel">
-            确认升级
+            :disabled="!selectedUpgradeLevel && !isDowngradeToRegular">
+            {{ isDowngradeToRegular ? '确认降级' : '确认升级' }}
           </button>
         </div>
       </div>
@@ -154,7 +163,7 @@
     <!-- 成功提示 -->
     <div class="toast" v-if="showToast">
       <div class="toast-content">
-        <span class="toast-icon">{{ toastType === 'success' ? '✓' : '!' }}</span>
+        <span class="toast-icon" :class="toastType">{{ toastType === 'success' ? '✓' : '!' }}</span>
         <div class="toast-message">
           <h4>{{ toastTitle }}</h4>
           <p>{{ toastMessage }}</p>
@@ -174,7 +183,7 @@ const router = useRouter();
 
 // 当前用户信息
 const currentUser = ref(JSON.parse(localStorage.getItem('currentUser')));
-const currentMembership = ref('non_member');
+const currentMembership = ref('regular'); // 默认普通用户
 const showBenefits = ref(false);
 const showUpgradeModal = ref(false);
 const selectedUpgradeLevel = ref('');
@@ -182,48 +191,46 @@ const showToast = ref(false);
 const toastTitle = ref('');
 const toastMessage = ref('');
 const toastType = ref('success');
+const isDowngradeToRegular = ref(false); // 新增：标记是否降级到普通用户
+const downgradeLosses = ref([]); // 新增：降级损失的权益列表
 
-// 会员等级中文显示
+// 会员等级中文显示 - 移除非会员，普通会员改为普通用户
 const getMembershipText = (level) => {
   const membershipTexts = {
-    'non_member': '非会员',
-    'regular': '普通会员',
+    'regular': '普通用户',
     'silver': '白银会员',
     'gold': '黄金会员',
     'diamond': '钻石会员'
   };
-  return membershipTexts[level] || '非会员';
+  return membershipTexts[level] || '普通用户';
 };
 
-// 会员等级图标
+// 会员等级图标 - 移除非会员
 const getMembershipIcon = (level) => {
   const icons = {
-    'non_member': '👤',
     'regular': '⭐',
     'silver': '🥈',
     'gold': '🥇',
     'diamond': '💎'
   };
-  return icons[level] || '👤';
+  return icons[level] || '⭐';
 };
 
-// 会员等级描述
+// 会员等级描述 - 移除非会员，更新普通会员为普通用户
 const getMembershipDescription = (level) => {
   const descriptions = {
-    'non_member': '基础功能体验，部分高级功能受限',
-    'regular': '享受基础会员权益，解锁更多功能',
+    'regular': '基础用户权益，免费使用平台基础功能',
     'silver': '白银会员专享，更多高级功能与服务',
     'gold': '黄金会员尊享，优先体验新功能与专属服务',
     'diamond': '钻石会员顶级权益，全方位尊享服务'
   };
-  return descriptions[level] || '基础功能体验';
+  return descriptions[level] || '基础用户权益';
 };
 
-// 会员权益配置
+// 会员权益配置 - 移除非会员列
 const membershipBenefits = ref([
   {
     name: 'AI智能反馈次数',
-    non_member: '每日5次',
     regular: '每日20次',
     silver: '每日50次',
     gold: '每日100次',
@@ -231,7 +238,6 @@ const membershipBenefits = ref([
   },
   {
     name: 'AR智能导览',
-    non_member: '基础版',
     regular: '标准版',
     silver: '高级版',
     gold: '专业版',
@@ -239,7 +245,6 @@ const membershipBenefits = ref([
   },
   {
     name: '数据驾驶舱',
-    non_member: '❌',
     regular: '基础数据',
     silver: '标准数据',
     gold: '高级数据',
@@ -247,15 +252,13 @@ const membershipBenefits = ref([
   },
   {
     name: '灵工资源池',
-    non_member: '❌',
-    regular: '❌',
-    silver: '基础访问',
+    regular: '基础访问',
+    silver: '标准访问',
     gold: '高级访问',
     diamond: '全部访问'
   },
   {
     name: '专属客服',
-    non_member: '❌',
     regular: '❌',
     silver: '工作日',
     gold: '7×12小时',
@@ -263,7 +266,6 @@ const membershipBenefits = ref([
   },
   {
     name: '新功能优先体验',
-    non_member: '❌',
     regular: '❌',
     silver: '❌',
     gold: '✅',
@@ -271,18 +273,19 @@ const membershipBenefits = ref([
   }
 ]);
 
-// 会员套餐配置
+// 会员套餐配置 - 普通会员改为普通用户
 const membershipPlans = ref([
   {
     level: 'regular',
-    title: '普通会员',
-    price: '¥19.9',
-    period: '/月',
+    title: '普通用户',
+    price: '免费',
+    period: '',
     features: [
       '每日20次AI智能反馈',
       '标准版AR智能导览',
       '数据驾驶舱基础数据',
-      '会员专属标识'
+      '灵工资源池基础访问',
+      '用户专属标识'
     ]
   },
   {
@@ -294,7 +297,7 @@ const membershipPlans = ref([
       '每日50次AI智能反馈',
       '高级版AR智能导览',
       '数据驾驶舱标准数据',
-      '灵工资源池基础访问',
+      '灵工资源池标准访问',
       '工作日专属客服',
       '会员专属标识'
     ]
@@ -334,11 +337,15 @@ const membershipPlans = ref([
 
 // 升级选项（显示所有更高等级的选项）
 const upgradeOptions = computed(() => {
+  // 过滤出比当前等级高的会员
+  const levelOrder = ['regular', 'silver', 'gold', 'diamond'];
+  const currentIndex = levelOrder.indexOf(currentMembership.value);
+  
   return membershipPlans.value.filter((plan) => {
-    return plan.level !== currentMembership.value;
+    return levelOrder.indexOf(plan.level) > currentIndex;
   }).map(plan => {
     const levelTexts = {
-      'regular': '普通会员',
+      'regular': '普通用户',
       'silver': '白银会员',
       'gold': '黄金会员',
       'diamond': '钻石会员'
@@ -347,7 +354,7 @@ const upgradeOptions = computed(() => {
     return {
       level: plan.level,
       title: `升级至${levelTexts[plan.level]}`,
-      price: `${plan.price}${plan.period}`,
+      price: `${plan.price}${plan.period || ''}`,
       benefits: plan.features[0] + '，' + plan.features[1]
     };
   });
@@ -365,20 +372,49 @@ const getBenefitIcon = (value) => {
 
 // 获取套餐按钮文本
 const getPlanButtonText = (level) => {
-  return currentMembership.value < level ? `升级至${getMembershipText(level)}` : `切换至${getMembershipText(level)}`;
+  const levelOrder = ['regular', 'silver', 'gold', 'diamond'];
+  const currentIndex = levelOrder.indexOf(currentMembership.value);
+  const targetIndex = levelOrder.indexOf(level);
+  
+  if (currentIndex < targetIndex) {
+    return `升级至${getMembershipText(level)}`;
+  } else if (currentIndex > targetIndex) {
+    return `降级至${getMembershipText(level)}`;
+  }
+  
+  return '当前套餐';
 };
 
-// 选择套餐
+// 选择套餐 - 修改：处理降级到普通用户的情况
 const selectPlan = (level) => {
-  selectedUpgradeLevel.value = level;
+  if (level === 'regular' && currentMembership.value !== 'regular') {
+    // 降级到普通用户
+    isDowngradeToRegular.value = true;
+    selectedUpgradeLevel.value = 'regular';
+    
+    // 获取当前会员等级的权益
+    const currentPlan = membershipPlans.value.find(p => p.level === currentMembership.value);
+    const regularPlan = membershipPlans.value.find(p => p.level === 'regular');
+    
+    // 计算降级损失的权益
+    if (currentPlan && regularPlan) {
+      downgradeLosses.value = currentPlan.features.filter(feature => 
+        !regularPlan.features.includes(feature)
+      );
+    }
+  } else {
+    isDowngradeToRegular.value = false;
+    selectedUpgradeLevel.value = level;
+  }
+  
   showUpgradeModal.value = true;
 };
 
-// 确认升级
+// 确认升级/降级
 const confirmUpgrade = () => {
   if (!selectedUpgradeLevel.value || !currentUser.value) return;
   
-  // 调用用户存储工具更新会员等级
+  // 更新会员等级
   const result = updateMembershipLevel(
     currentUser.value.username,
     currentUser.value.role,
@@ -386,35 +422,48 @@ const confirmUpgrade = () => {
   );
   
   if (result.success) {
-    // 更新当前会员状态
-    currentMembership.value = selectedUpgradeLevel.value;
+    handleMembershipUpdateSuccess();
     
-    // 更新localStorage中的用户信息
-    currentUser.value.membershipLevel = selectedUpgradeLevel.value;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser.value));
-    localStorage.setItem('userMembership', selectedUpgradeLevel.value);
-    
-    // 通知其他组件更新会员状态
-    eventBus.emit('membershipUpdated', selectedUpgradeLevel.value);
-    
-    // 显示成功提示
-    showToastNotification(
-      '操作成功',
-      `恭喜您已成功${currentMembership.value < selectedUpgradeLevel.value ? '升级为' : '切换至'}${getMembershipText(selectedUpgradeLevel.value)}`,
-      'success'
-    );
-    
-    // 关闭弹窗
-    showUpgradeModal.value = false;
-    selectedUpgradeLevel.value = '';
+    if (isDowngradeToRegular.value) {
+      showToastNotification(
+        '降级成功',
+        '您已成功降级为普通用户',
+        'success'
+      );
+    } else {
+      showToastNotification(
+        '升级成功',
+        `恭喜您已成功升级为${getMembershipText(selectedUpgradeLevel.value)}`,
+        'success'
+      );
+    }
   } else {
-    // 显示失败提示
     showToastNotification(
       '操作失败',
-      result.message || '会员等级变更过程中出现错误，请重试',
+      result.message || '会员操作过程中出现错误，请重试',
       'error'
     );
   }
+  
+  // 关闭弹窗并重置状态
+  showUpgradeModal.value = false;
+  selectedUpgradeLevel.value = '';
+  isDowngradeToRegular.value = false;
+  downgradeLosses.value = [];
+};
+
+// 处理会员等级更新成功
+const handleMembershipUpdateSuccess = () => {
+  // 更新当前会员状态
+  currentMembership.value = selectedUpgradeLevel.value;
+  
+  // 更新localStorage中的用户信息
+  currentUser.value.membershipLevel = selectedUpgradeLevel.value;
+  localStorage.setItem('currentUser', JSON.stringify(currentUser.value));
+  localStorage.setItem('userMembership', selectedUpgradeLevel.value);
+  
+  // 通知其他组件更新会员状态
+  eventBus.emit('membershipUpdated', selectedUpgradeLevel.value);
 };
 
 // 显示提示消息
@@ -440,16 +489,22 @@ onMounted(() => {
   // 优先从localStorage获取会员状态
   const savedMembership = localStorage.getItem('userMembership');
   if (savedMembership) {
-    currentMembership.value = savedMembership;
+    // 处理旧数据中的non_member，自动转换为regular
+    currentMembership.value = savedMembership === 'non_member' ? 'regular' : savedMembership;
   } else if (currentUser.value.membershipLevel) {
-    currentMembership.value = currentUser.value.membershipLevel;
-    localStorage.setItem('userMembership', currentUser.value.membershipLevel);
+    // 处理用户数据中的旧会员等级
+    currentMembership.value = currentUser.value.membershipLevel === 'non_member' 
+      ? 'regular' 
+      : currentUser.value.membershipLevel;
+    localStorage.setItem('userMembership', currentMembership.value);
   } else {
     // 从用户存储中获取
     const membership = getUserMembership(currentUser.value.username, currentUser.value.role);
     if (membership.success) {
-      currentMembership.value = membership.membershipLevel;
-      localStorage.setItem('userMembership', membership.membershipLevel);
+      currentMembership.value = membership.membershipLevel === 'non_member' 
+        ? 'regular' 
+        : membership.membershipLevel;
+      localStorage.setItem('userMembership', currentMembership.value);
     }
   }
   
@@ -471,6 +526,7 @@ onMounted(() => {
   min-height: 100vh;
   background-color: #f8f9fa;
   padding-bottom: 60px;
+  padding-top: 70px; /* 为固定导航栏留出空间 */
 }
 
 .container {
@@ -549,10 +605,7 @@ onMounted(() => {
   background-color: #f0f5ff;
 }
 
-.status-icon.icon-non_member {
-  background-color: #f8f9fa;
-}
-
+/* 移除non_member样式，保留其他会员等级样式 */
 .status-icon.icon-regular {
   background-color: #fff8e1;
 }
@@ -595,11 +648,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
-.badge-non_member {
-  background-color: #e9ecef;
-  color: #666;
-}
-
+/* 移除non_member样式，保留其他会员等级样式 */
 .badge-regular {
   background-color: #fff8e1;
   color: #ffb300;
@@ -665,61 +714,76 @@ onMounted(() => {
   background-color: #e9ecef;
 }
 
-/* 会员权益展示 */
+/* 会员权益展示 - 修改：使用卡片式布局 */
 .membership-benefits {
   padding: 60px 0;
   background-color: #f8f9fa;
 }
 
-.benefits-table {
+.benefits-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.benefit-card {
   background-color: white;
   border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
 }
 
-.benefits-header {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-  background-color: #165DFF;
-  color: white;
+.benefit-card:hover {
+  transform: translateY(-5px);
 }
 
-.header-item {
+.benefit-card-header {
   padding: 15px;
-  font-weight: 600;
   text-align: center;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 600;
 }
 
-.header-item:last-child {
-  border-right: none;
+.header-regular {
+  background-color: #ffb300;
 }
 
-.benefits-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-  border-bottom: 1px solid #eee;
+.header-silver {
+  background-color: #5c6bc0;
 }
 
-.benefits-row:last-child {
-  border-bottom: none;
+.header-gold {
+  background-color: #f57c00;
+}
+
+.header-diamond {
+  background-color: #00acc1;
+}
+
+.benefit-card-body {
+  padding: 20px;
 }
 
 .benefit-item {
-  padding: 15px;
-  text-align: center;
-  border-right: 1px solid #eee;
-}
-
-.benefit-item:first-child {
-  text-align: left;
-  font-weight: 500;
-  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .benefit-item:last-child {
-  border-right: none;
+  border-bottom: none;
+}
+
+.benefit-name {
+  color: #333;
+  font-weight: 500;
+}
+
+.benefit-value {
+  font-weight: 600;
 }
 
 .no-benefit {
@@ -728,7 +792,6 @@ onMounted(() => {
 
 .has-benefit {
   color: #165DFF;
-  font-weight: 500;
 }
 
 /* 会员套餐展示 */
@@ -764,10 +827,7 @@ onMounted(() => {
   color: white;
 }
 
-.header-non_member {
-  background-color: #6c757d;
-}
-
+/* 移除non_member样式，保留其他会员等级样式 */
 .header-regular {
   background-color: #ffb300;
 }
@@ -844,6 +904,14 @@ onMounted(() => {
   transition: all 0.3s;
 }
 
+.select-plan-btn.free-action {
+  background-color: #28a745;
+}
+
+.select-plan-btn.free-action:hover {
+  background-color: #218838;
+}
+
 .select-plan-btn:hover {
   background-color: #0E4CD1;
 }
@@ -862,7 +930,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* 升级会员弹窗 */
+/* 升级/降级会员弹窗 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -912,6 +980,41 @@ onMounted(() => {
 
 .modal-body {
   padding: 20px;
+}
+
+/* 修改：降级警告样式 */
+.downgrade-warning {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.warning-icon {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.downgrade-warning h4 {
+  color: #dc3545;
+  margin-bottom: 15px;
+}
+
+.downgrade-losses {
+  text-align: left;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.downgrade-losses li {
+  padding: 5px 0;
+  color: #666;
+}
+
+.downgrade-note {
+  color: #dc3545;
+  font-weight: 600;
+  margin-top: 15px;
 }
 
 .upgrade-options {
@@ -1000,7 +1103,7 @@ onMounted(() => {
   position: fixed;
   top: 15%;
   left: 50%;
-  height: 100px;
+  transform: translateX(-50%);
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
@@ -1043,11 +1146,11 @@ onMounted(() => {
 
 @keyframes slideIn {
   from {
-    transform: translateX(100%);
+    transform: translate(-50%, -50px);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translate(-50%, 0);
     opacity: 1;
   }
 }
@@ -1074,18 +1177,8 @@ onMounted(() => {
     flex-direction: column;
   }
   
-  .benefits-header, .benefits-row {
+  .benefits-cards {
     grid-template-columns: 1fr;
-  }
-  
-  .header-item, .benefit-item {
-    border-right: none;
-    border-bottom: 1px solid #eee;
-    text-align: left;
-  }
-  
-  .header-item:last-child, .benefit-item:last-child {
-    border-bottom: none;
   }
 }
 </style>

@@ -125,7 +125,7 @@ defineExpose({ currentIndex });
 .home-carousel {
   position: relative;
   width: 100%;
-  height: calc(100vh - 90px); 
+  height: calc(100vh - 70px); 
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -215,7 +215,7 @@ defineExpose({ currentIndex });
 /* 响应式调整 */
 @media (max-width: 768px) {
   .home-carousel {
-    height: calc(80vh - 90px);
+    height: calc(80vh - 70px);
   }
   
   .carousel-controls {

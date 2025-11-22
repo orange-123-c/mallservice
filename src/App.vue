@@ -48,17 +48,20 @@ body {
 /* 应用容器 */
 .app-container {
   /* 确保内容区在导航栏下方 */
-  padding-top: 90px; /* 与导航栏高度一致（你的导航栏高度是90px） */
-  min-height: 100vh; /* 最小高度占满屏幕 */
+    padding-top: 70px; /* 与导航栏高度一致（你的导航栏高度是90px） */
+
+  height: 100vh; /* 最小高度占满屏幕 */
   display: flex;
-  flex-direction: column;
+    flex-direction: column;
+
 }
 
 /* 主内容区 */
 .main-content {
-  max-width:1620px; /* 与导航栏最大宽度一致，保持居中 */
   width: 100%;
-  margin: -5px auto;
+  height: 100%;
+    margin: -5px auto;
+
   /* padding: 30px 35px; 左右内边距与导航栏对齐 */
 }
 

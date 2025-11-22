@@ -466,25 +466,32 @@ function getTrendSymbol(trend) {
   font-family: 'Segoe UI', system-ui, sans-serif;
   color: #333;
   background-color: #f5f7fa;
-  min-height: 100vh;
-  margin: 0;
+height: 100%;  margin: 0;
   padding: 0;
+     background-image: url('../assets/beijing.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+overflow-y: auto;
 }
 
 .container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+width: 80%;  margin: 0 auto;
   padding: 0 20px;
   box-sizing: border-box;
 }
 
 /* 页面头部 */
 .page-header {
+width: 80%;
+text-align: center;
+margin:auto;
+margin-top: 20px;
   background-color: #fff;
   padding: 2rem 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   margin-bottom: 2rem;
+    border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .page-title {

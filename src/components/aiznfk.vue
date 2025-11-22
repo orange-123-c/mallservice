@@ -792,9 +792,16 @@ onMounted(() => {
 
 <style scoped>
 /* 全局样式 */
+
+
 .feedback-platform {
-  min-height: 100vh;
-  background-color: #f8fafc;
+
+  background-image: url('../assets/beijing.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+overflow-y: auto;
+height: 100%;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: #334155;
 }
@@ -807,10 +814,11 @@ onMounted(() => {
 
 /* 头部样式 */
 .header {
+  height:40px;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
-  top: 0;
+  top: 0px;
   z-index: 100;
 }
 
@@ -822,6 +830,9 @@ onMounted(() => {
 }
 
 .logo-section {
+  position: absolute;
+  left:5%;
+  top: 1%;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -834,15 +845,21 @@ onMounted(() => {
 }
 
 .logo-text {
-  font-size: 18px;
+  font-size: 23px;
   font-weight: 600;
-  color: #1e293b;
+  color: black;
+  letter-spacing: 1.5px;
   margin: 0;
+  
 }
 
 .nav-actions {
+  position: absolute;
+  right: 3%;
   display: flex;
   gap: 20px;
+    top: 1%;
+
 }
 
 .nav-btn {
@@ -879,11 +896,11 @@ onMounted(() => {
   justify-content: center;
 }
 
-/* 主要内容样式 */
+/* 主要内容样式 - 修改部分 */
 .main-content {
   padding: 30px 0;
+margin-top: 39px;
 }
-
 .page-header {
   margin-bottom: 30px;
 }
@@ -1094,6 +1111,7 @@ onMounted(() => {
 .btn-outline {
   background-color: white;
   color: #64748b;
+
   border: 1px solid #e2e8f0;
 }
 

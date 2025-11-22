@@ -4,7 +4,6 @@
       <div class="slide-overlay"></div>
       <div class="tech-decoration left"></div>
       <div class="tech-decoration right"></div>
-
       <div class="slide-content">
         <div class="mall-service-page">
           <!-- 头部标题区域 -->
@@ -250,7 +249,10 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import MonthlySatisfactionPie from './echart/MonthlySatisfactionPie.vue';
 import ServiceSatisfactionBar from './echart/ServiceSatisfactionBar.vue';
-
+import profile1 from '@/assets/profile1.png';
+import profile2 from '@/assets/profile2.png';
+import slogo1 from '@/assets/servicelogo1.jpg';
+import slogo2 from '@/assets/servicelogo2.jpg';
 // 状态管理
 const currentBannerIndex = ref(0);
 let bannerTimer = null;
@@ -360,13 +362,13 @@ const statsDataArray = computed(() => [
 
 const reviews = ref([
   {
-    avatar: 'https://via.placeholder.com/70',
+    avatar: profile1,
     name: '张女士',
     content: '卫生间设施损坏反馈后，不到半小时就有人来维修了，效率很高！',
     time: '2小时前'
   },
   {
-    avatar: 'https://via.placeholder.com/70',
+    avatar: profile2,
     name: '李先生',
     content: '客服很耐心地指引我找到了停车场，还帮我联系了商户预留商品，非常贴心',
     time: '昨天'
@@ -375,7 +377,7 @@ const reviews = ref([
 
 const caseStudies = ref([
   {
-    image: 'https://via.placeholder.com/120x80',
+    image: slogo1,
     title: '紧急医疗协助',
     desc: '快速响应顾客突发不适情况',
     meta: '处理时间: 5分钟',
@@ -386,7 +388,7 @@ const caseStudies = ref([
     }
   },
   {
-    image: 'https://via.placeholder.com/120x80',
+    image: slogo2,
     title: '设施抢修',
     desc: '电梯故障紧急维修处理',
     meta: '处理时间: 45分钟',
@@ -560,8 +562,7 @@ defineExpose({ reset });
 .slide {
   flex: 0 0 100%;
   position: relative;
-  height: 100%;
-  min-height: calc(100vh - 90px);
+  min-height: calc(100vh - 70px);
   overflow: hidden;
 }
 
@@ -604,7 +605,7 @@ defineExpose({ reset });
 
 .slide-content {
   height: 100%;
-  max-height: calc(100vh - 90px);
+  max-height: calc(100vh - 70px);
   position: absolute;
   top: 0;
   left: 0;
@@ -661,6 +662,7 @@ defineExpose({ reset });
   text-align: center;
   margin-bottom: 30px;
   padding: 0 20px;
+  margin-top: 20px;
 }
 
 .header h1 {

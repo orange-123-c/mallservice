@@ -1,19 +1,28 @@
 <template>
   <div class="job-platform-container">
     <!-- 页面标题 -->
+    <h1 class="page-title">兼职岗位平台</h1>
     
     <!-- 兼职岗位列表容器 -->
     <div class="job-list-container">
       <!-- 标题栏 -->
       <div class="header-bar">
         <h2 class="header-title">
-          <i class="icon-briefcase"></i>兼职岗位列表
+          <i class="icon-briefcase"></i>{{ isMerchant ? '我的发布岗位' : '兼职岗位列表' }}
         </h2>
         <div class="header-right">
           <div class="location-selector">
             <i class="icon-map-marker"></i>上海市
+            <i class="icon-arrow-down"></i>
           </div>
-          <button class="publish-btn">发布兼职</button>
+          <div class="search-box">
+            <input type="text" placeholder="搜索岗位/公司" v-model="searchKeyword">
+            <button class="search-btn" @click="searchJobs">
+              <i class="icon-search"></i>
+            </button>
+          </div>
+          <!-- 用户能看到发布按钮，商家看不到 -->
+          <button v-if="!isMerchant" class="publish-btn">发布兼职</button>
         </div>
       </div>
       
@@ -63,6 +72,12 @@
             </button>
           </div>
         </div>
+        
+        <!-- 筛选操作 -->
+        <div class="filter-actions">
+          <button class="reset-btn" @click="resetFilters">重置筛选</button>
+          <button class="filter-count">{{ filteredJobs.length }} 个岗位</button>
+        </div>
       </div>
       
       <!-- 列表头部 -->
@@ -88,8 +103,8 @@
           <div class="item-cell company-cell">{{ job.company }}</div>
           <div class="item-cell salary-cell">{{ job.salary }}</div>
           <div class="item-cell location-cell">{{ job.location }}</div>
-          <div class="item-cell date-cell">{{ job.publishDate }}</div>
-          <div class="item-cell distance-cell">{{ job.distance }}</div>
+          <div class="item-cell date-cell">{{ formatDate(job.publishDate) }}</div>
+          <div class="item-cell distance-cell">{{ job.distance }}km</div>
           <div class="item-cell tags-cell">
             <span 
               v-for="tag in job.tags" 
@@ -110,23 +125,24 @@
       <div v-if="filteredJobs.length === 0" class="empty-state">
         <i class="icon-search"></i>
         <p>暂无符合条件的岗位</p>
+        <button class="refresh-btn" @click="resetFilters">重新筛选</button>
       </div>
     </div>
   </div>
   
   <!-- 详情弹窗 - 移到组件根元素外，使用teleport传送至body -->
   <teleport to="body">
-    <!-- 详情弹窗 -->
-    <div v-if="visibleModal" class="modal-overlay">
+    <!-- 用户详情弹窗 -->
+    <div v-if="visibleModal && !isMerchant" class="modal-overlay" @click.self="closeDetailModal">
       <div class="modal-content">
         <div class="modal-header">
           <div class="job-info">
-            <h3 class="job-title">{{ currentJob.title }}</h3>
-            <p class="job-company">{{ currentJob.company }} · {{ currentJob.categoryText }}</p>
+            <h3 class="job-title">{{ currentJob?.title }}</h3>
+            <p class="job-company">{{ currentJob?.company }} · {{ currentJob?.categoryText }}</p>
           </div>
           <div class="salary-publish">
-            <span class="salary">{{ currentJob.salary }}</span>
-            <span class="publish-date">{{ currentJob.publishDate }}发布</span>
+            <span class="salary">{{ currentJob?.salary }}</span>
+            <span class="publish-date">{{ formatDate(currentJob?.publishDate) }}发布</span>
           </div>
           <button class="close-btn" @click="closeDetailModal">×</button>
         </div>
@@ -137,7 +153,7 @@
             <h4 class="section-title">岗位标签</h4>
             <div class="tag-group">
               <span 
-                v-for="tag in currentJob.tags" 
+                v-for="tag in currentJob?.tags" 
                 :key="tag.id"
                 class="tag"
                 :style="{ backgroundColor: tag.color }"
@@ -151,47 +167,176 @@
           <div class="section">
             <h4 class="section-title">工作地点</h4>
             <p class="location-detail">
-              <i class="icon-location"></i> {{ currentJob.locationDetail }}
+              <i class="icon-location"></i> {{ currentJob?.locationDetail }}
             </p>
             <p class="distance">
-              <i class="icon-distance"></i> 距离您约 {{ currentJob.distance }} 公里
+              <i class="icon-distance"></i> 距离您约 {{ currentJob?.distance }} 公里
             </p>
           </div>
           
           <!-- 工作描述 -->
           <div class="section">
             <h4 class="section-title">工作描述</h4>
-            <p class="description">{{ currentJob.description }}</p>
+            <p class="description">{{ currentJob?.description }}</p>
           </div>
           
           <!-- 任职要求 -->
           <div class="section">
             <h4 class="section-title">任职要求</h4>
-            <p class="requirement">{{ currentJob.requirement }}</p>
+            <p class="requirement">{{ currentJob?.requirement }}</p>
           </div>
           
           <!-- 福利待遇 -->
           <div class="section">
             <h4 class="section-title">福利待遇</h4>
-            <p class="welfare">{{ currentJob.welfare }}</p>
+            <p class="welfare">{{ currentJob?.welfare }}</p>
           </div>
           
           <!-- 联系方式 -->
           <div class="section">
             <h4 class="section-title">联系方式</h4>
-            <p class="contact">{{ currentJob.contact }}</p>
+            <p class="contact">{{ currentJob?.contact }}</p>
           </div>
         </div>
         
         <div class="modal-footer">
           <button 
             class="collect-btn" 
-            :class="{ 'collected': currentJob.collected }"
+            :class="{ 'collected': currentJob?.collected }"
             @click="toggleCollect"
           >
-            <i class="icon-star"></i> {{ currentJob.collected ? '已收藏' : '收藏' }}
+            <i class="icon-star"></i> {{ currentJob?.collected ? '已收藏' : '收藏' }}
           </button>
           <button class="apply-btn" @click="applyJob">立即申请</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商家详情弹窗 -->
+    <div v-if="visibleModal && isMerchant" class="modal-overlay" @click.self="closeDetailModal">
+      <div class="modal-content" style="width: 700px;">
+        <div class="modal-header">
+          <div class="job-info">
+            <h3 class="job-title">{{ currentJob?.title }}</h3>
+            <p class="job-company">{{ currentJob?.company }} · {{ currentJob?.categoryText }}</p>
+          </div>
+          <div class="salary-publish">
+            <span class="salary">{{ currentJob?.salary }}</span>
+            <span class="publish-date">{{ formatDate(currentJob?.publishDate) }}发布</span>
+          </div>
+          <button class="close-btn" @click="closeDetailModal">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- 岗位申请统计 -->
+          <div class="section">
+            <h4 class="section-title">申请统计</h4>
+            <div class="application-stats">
+              <div class="stat-item">
+                <span class="stat-label">总申请人数:</span>
+                <span class="stat-value">{{ currentJob?.applicationCount || 0 }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">已查看:</span>
+                <span class="stat-value">{{ currentJob?.viewedCount || 0 }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">已邀约:</span>
+                <span class="stat-value">{{ currentJob?.invitedCount || 0 }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">已录用:</span>
+                <span class="stat-value">{{ currentJob?.hiredCount || 0 }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 申请者列表 -->
+          <div class="section">
+            <h4 class="section-title">申请者列表</h4>
+            <div class="applicants-list">
+              <div v-for="(applicant, index) in currentJob?.applicants || []" :key="index" class="applicant-item">
+                <div class="applicant-info">
+                  <div class="applicant-name">{{ applicant.name }}</div>
+                  <div class="applicant-education">{{ applicant.education }} | {{ applicant.major }}</div>
+                  <div class="applicant-experience">{{ applicant.experience }}</div>
+                </div>
+                <div class="applicant-actions">
+                  <button class="view-resume-btn" @click="viewResume(applicant)">查看简历</button>
+                  <button class="contact-btn">联系TA</button>
+                </div>
+              </div>
+              <div v-if="!(currentJob?.applicants && currentJob.applicants.length)" class="no-applicants">
+                暂无申请者
+              </div>
+            </div>
+          </div>
+          
+          <!-- 岗位信息 -->
+          <div class="section">
+            <h4 class="section-title">岗位信息</h4>
+            <div class="job-details">
+              <p><strong>工作地点:</strong> {{ currentJob?.locationDetail }}</p>
+              <p><strong>工作描述:</strong> {{ currentJob?.description }}</p>
+              <p><strong>任职要求:</strong> {{ currentJob?.requirement }}</p>
+              <p><strong>福利待遇:</strong> {{ currentJob?.welfare }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- <div class="modal-footer">
+          <button class="edit-btn">编辑岗位</button>
+          <button class="view-applications-btn" @click="viewApplications">查看申请</button>
+          <button class="close-job-btn">关闭岗位</button>
+        </div> -->
+      </div>
+    </div>
+    
+    <!-- 简历查看弹窗 -->
+    <div v-if="showResumeModal" class="modal-overlay" @click.self="closeResumeModal">
+      <div class="modal-content" style="width: 600px;">
+        <div class="modal-header">
+          <h3 class="resume-title">{{ selectedApplicant?.name }} 的简历</h3>
+          <button class="close-btn" @click="closeResumeModal">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="resume-content">
+            <div class="resume-section">
+              <h4>基本信息</h4>
+              <p><strong>姓名:</strong> {{ selectedApplicant?.name }}</p>
+              <p><strong>性别:</strong> {{ selectedApplicant?.gender }}</p>
+              <p><strong>年龄:</strong> {{ selectedApplicant?.age }}</p>
+              <p><strong>电话:</strong> {{ selectedApplicant?.phone }}</p>
+              <p><strong>邮箱:</strong> {{ selectedApplicant?.email }}</p>
+            </div>
+            
+            <div class="resume-section">
+              <h4>教育背景</h4>
+              <p><strong>学校:</strong> {{ selectedApplicant?.school }}</p>
+              <p><strong>学历:</strong> {{ selectedApplicant?.education }}</p>
+              <p><strong>专业:</strong> {{ selectedApplicant?.major }}</p>
+              <p><strong>毕业时间:</strong> {{ selectedApplicant?.graduateDate }}</p>
+            </div>
+            
+            <div class="resume-section">
+              <h4>工作/实习经历</h4>
+              <p>{{ selectedApplicant?.experience }}</p>
+            </div>
+            
+            <div class="resume-section">
+              <h4>技能特长</h4>
+              <p>{{ selectedApplicant?.skills }}</p>
+            </div>
+            
+            <div class="resume-section">
+              <h4>自我评价</h4>
+              <p>{{ selectedApplicant?.selfEvaluation }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="contact-btn">联系TA</button>
+          <button class="download-resume-btn">下载简历</button>
         </div>
       </div>
     </div>
@@ -204,7 +349,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
+
+// 登录角色标识（实际项目中从登录状态获取）
+const isMerchant = ref(true); // true为商家，false为用户
+
+// 搜索关键词
+const searchKeyword = ref('');
 
 // 岗位分类数据
 const categories = ref([
@@ -236,7 +387,7 @@ const sorts = ref([
   { id: 'distance', name: '距离最近', active: false }
 ]);
 
-// 岗位数据（新增详情字段）
+// 岗位数据（新增商家相关字段）
 const jobs = ref([
   {
     id: 1,
@@ -260,7 +411,42 @@ const jobs = ref([
     requirement: '18-30岁，形象良好，沟通能力强，能吃苦耐劳，有餐饮行业经验者优先。',
     welfare: '包工作餐，灵活排班，就近分配，节日福利',
     contact: '李经理 13812345678',
-    collected: false
+    collected: false,
+    // 商家相关字段
+    applicationCount: 12,
+    viewedCount: 8,
+    invitedCount: 3,
+    hiredCount: 1,
+    applicants: [
+      {
+        name: '张三',
+        gender: '男',
+        age: 22,
+        education: '本科',
+        school: '上海财经大学',
+        major: '酒店管理',
+        experience: '有1年餐饮服务经验',
+        phone: '13800138000',
+        email: 'zhangsan@example.com',
+        graduateDate: '2025-06',
+        skills: '沟通能力强，熟悉餐厅服务流程',
+        selfEvaluation: '工作认真负责，能吃苦耐劳'
+      },
+      {
+        name: '李四',
+        gender: '女',
+        age: 20,
+        education: '大专',
+        school: '上海旅游高等专科学校',
+        major: '餐饮管理',
+        experience: '在校期间有餐厅兼职经验',
+        phone: '13900139000',
+        email: 'lisi@example.com',
+        graduateDate: '2026-06',
+        skills: '服务意识强，团队合作能力好',
+        selfEvaluation: '热爱餐饮行业，学习能力强'
+      }
+    ]
   },
   {
     id: 2,
@@ -283,7 +469,13 @@ const jobs = ref([
     requirement: '男性，20-45岁，持有电工证，有2年以上相关工作经验，能适应紧急抢修。',
     welfare: '五险一金，高温补贴，节日福利，定期培训',
     contact: '王主管 13987654321',
-    collected: false
+    collected: false,
+    // 商家相关字段
+    applicationCount: 8,
+    viewedCount: 5,
+    invitedCount: 2,
+    hiredCount: 0,
+    applicants: []
   },
   {
     id: 3,
@@ -306,7 +498,28 @@ const jobs = ref([
     requirement: '设计相关专业，熟练使用PS、AI等设计软件，有服装行业设计经验者优先，需提供作品集。',
     welfare: '设计软件补贴，免费服装福利，灵活工作时间',
     contact: '张设计 13765432109',
-    collected: false
+    collected: false,
+    // 商家相关字段
+    applicationCount: 15,
+    viewedCount: 10,
+    invitedCount: 4,
+    hiredCount: 2,
+    applicants: [
+      {
+        name: '王五',
+        gender: '男',
+        age: 24,
+        education: '本科',
+        school: '上海视觉艺术学院',
+        major: '视觉传达设计',
+        experience: '有2年平面设计经验',
+        phone: '13700137000',
+        email: 'wangwu@example.com',
+        graduateDate: '2023-06',
+        skills: '精通PS、AI、AE，有电商设计经验',
+        selfEvaluation: '创意能力强，执行力好'
+      }
+    ]
   },
   {
     id: 4,
@@ -329,7 +542,13 @@ const jobs = ref([
     requirement: '在校大学生，市场营销、广告相关专业优先，有活动策划经验者优先，每周可实习3天以上。',
     welfare: '实习证明，包工作餐，商业保险，节日福利',
     contact: '刘经理 13698765432',
-    collected: false
+    collected: false,
+    // 商家相关字段
+    applicationCount: 20,
+    viewedCount: 15,
+    invitedCount: 8,
+    hiredCount: 3,
+    applicants: []
   },
   {
     id: 5,
@@ -352,7 +571,13 @@ const jobs = ref([
     requirement: '18-35岁，形象气质佳，沟通能力强，有服装销售经验者优先，能适应早晚班。',
     welfare: '销售提成，员工折扣，节日福利，定期团建',
     contact: '陈店长 13587654321',
-    collected: false
+    collected: false,
+    // 商家相关字段
+    applicationCount: 25,
+    viewedCount: 20,
+    invitedCount: 10,
+    hiredCount: 5,
+    applicants: []
   },
   {
     id: 6,
@@ -375,7 +600,13 @@ const jobs = ref([
     requirement: '18-30岁，普通话标准，沟通能力强，有客服经验者优先，需熟悉苹果产品。',
     welfare: '包工作餐，定期培训，节日福利，晋升空间',
     contact: '吴主管 13476543210',
-    collected: false
+    collected: false,
+    // 商家相关字段
+    applicationCount: 18,
+    viewedCount: 12,
+    invitedCount: 6,
+    hiredCount: 2,
+    applicants: []
   }
 ]);
 
@@ -408,10 +639,66 @@ const toggleSort = (sortId) => {
   });
 };
 
+// 重置筛选条件
+const resetFilters = () => {
+  searchKeyword.value = '';
+  activeCategory.value = 'all';
+  activeSalary.value = 'all';
+  activeSort.value = 'latest';
+  
+  // 重置所有筛选按钮状态
+  categories.value.forEach(cat => cat.active = cat.id === 'all');
+  salaries.value.forEach(sal => sal.active = sal.id === 'all');
+  sorts.value.forEach(srt => srt.active = srt.id === 'latest');
+};
+
+// 搜索岗位
+const searchJobs = () => {
+  // 搜索功能已整合到computed中，这里只需触发更新
+};
+
+// 监听搜索关键词，支持回车搜索
+watch(searchKeyword, (newVal) => {
+  if (newVal && newVal.includes('\n')) {
+    searchKeyword.value = newVal.replace('\n', '');
+    searchJobs();
+  }
+});
+
+// 格式化日期显示
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  
+  const today = new Date();
+  const targetDate = new Date(dateStr);
+  const diffTime = Math.abs(today - targetDate);
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 0) {
+    return '今天';
+  } else if (diffDays === 1) {
+    return '昨天';
+  } else if (diffDays < 7) {
+    return `${diffDays}天前`;
+  } else {
+    return dateStr;
+  }
+};
+
 // 根据筛选条件和排序方式过滤岗位
 const filteredJobs = computed(() => {
   // 1. 先进行筛选
   let result = jobs.value.filter(job => {
+    // 关键词搜索筛选
+    if (searchKeyword.value) {
+      const keyword = searchKeyword.value.toLowerCase();
+      if (!job.title.toLowerCase().includes(keyword) && 
+          !job.company.toLowerCase().includes(keyword) &&
+          !job.categoryText.toLowerCase().includes(keyword)) {
+        return false;
+      }
+    }
+    
     // 分类筛选
     if (activeCategory.value !== 'all' && job.category !== activeCategory.value) {
       return false;
@@ -469,20 +756,59 @@ const currentJob = ref(null);
 const showToast = ref(false);
 const toastMessage = ref('');
 
+// 商家简历查看相关状态
+const showResumeModal = ref(false);
+const selectedApplicant = ref(null);
+
 // 打开详情弹窗
 const openDetailModal = (job) => {
   currentJob.value = { ...job };
   visibleModal.value = true;
+  // 阻止页面滚动
+  document.body.style.overflow = 'hidden';
 };
 
 // 关闭详情弹窗
 const closeDetailModal = () => {
   visibleModal.value = false;
+  // 恢复页面滚动
+  document.body.style.overflow = '';
+};
+
+// 查看简历
+const viewResume = (applicant) => {
+  selectedApplicant.value = applicant;
+  showResumeModal.value = true;
+};
+
+// 关闭简历弹窗
+const closeResumeModal = () => {
+  showResumeModal.value = false;
+  selectedApplicant.value = null;
+};
+
+// 查看申请（商家功能）
+const viewApplications = () => {
+  // 这里可以跳转到更详细的申请管理页面
+  toastMessage.value = '查看申请详情';
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, 2000);
 };
 
 // 切换收藏状态
 const toggleCollect = () => {
+  if (!currentJob.value) return;
+  
   currentJob.value.collected = !currentJob.value.collected;
+  
+  // 更新原数据中的收藏状态
+  const jobIndex = jobs.value.findIndex(j => j.id === currentJob.value.id);
+  if (jobIndex !== -1) {
+    jobs.value[jobIndex].collected = currentJob.value.collected;
+  }
+  
   toastMessage.value = currentJob.value.collected ? '收藏成功' : '取消收藏成功';
   showToast.value = true;
   setTimeout(() => {
@@ -492,7 +818,7 @@ const toggleCollect = () => {
 
 // 申请岗位
 const applyJob = () => {
-  toastMessage.value = '申请成功，请等待企业联系';
+  toastMessage.value = '申请成功，请等待企业联系（简历已发送至商家邮箱）';
   showToast.value = true;
   setTimeout(() => {
     showToast.value = false;
@@ -513,7 +839,6 @@ const applyJob = () => {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  /* 移除relative定位，避免影响子元素的绝对定位 */
 }
 
 /* 页面标题 */
@@ -535,7 +860,6 @@ const applyJob = () => {
   flex-direction: column;
   flex-grow: 1;
   min-height: 0; /* 解决flex容器中overflow的问题 */
-  /* 移除relative定位 */
 }
 
 /* 标题栏 */
@@ -571,11 +895,60 @@ const applyJob = () => {
   color: #666;
   display: flex;
   align-items: center;
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.location-selector:hover {
+  background-color: #f5f7fa;
 }
 
 .location-selector i {
   color: #1890ff;
   margin-right: 5px;
+}
+
+.location-selector .icon-arrow-down {
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  padding: 0 10px;
+  height: 32px;
+}
+
+.search-box input {
+  border: none;
+  background: none;
+  outline: none;
+  padding: 0 5px;
+  width: 180px;
+  color: #333;
+}
+
+.search-box input::placeholder {
+  color: #999;
+}
+
+.search-btn {
+  border: none;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.search-btn:hover {
+  color: #1890ff;
 }
 
 .publish-btn {
@@ -599,8 +972,7 @@ const applyJob = () => {
   background-color: #fafafa;
   border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
-  overflow-y: auto;
-  max-height: 250px;
+  height: 290px;
 }
 
 .filter-group {
@@ -640,6 +1012,37 @@ const applyJob = () => {
   background-color: #1890ff;
   color: #fff;
   border-color: #1890ff;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.reset-btn {
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #666;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reset-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.filter-count {
+  padding: 6px 12px;
+  border: none;
+  background-color: #e6f7ff;
+  color: #1890ff;
+  font-size: 13px;
+  border-radius: 4px;
 }
 
 /* 列表头部 */
@@ -757,6 +1160,26 @@ const applyJob = () => {
   color: #ddd;
 }
 
+.empty-state p {
+  margin-bottom: 20px;
+}
+
+.refresh-btn {
+  padding: 8px 16px;
+  border: 1px solid #1890ff;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #1890ff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+  background-color: #1890ff;
+  color: #fff;
+}
+
 /* 响应式调整 */
 @media (max-width: 1024px) {
   .list-header, .job-item {
@@ -775,6 +1198,15 @@ const applyJob = () => {
 
 <!-- 弹窗样式需要放在scoped样式外，或者使用deep选择器 -->
 <style>
+/* 图标样式（模拟，实际项目中可使用Font Awesome或其他图标库） */
+.icon-briefcase:before { content: "💼"; }
+.icon-map-marker:before { content: "📍"; }
+.icon-arrow-down:before { content: "▼"; }
+.icon-search:before { content: "🔍"; }
+.icon-location:before { content: "📍"; }
+.icon-distance:before { content: "📏"; }
+.icon-star:before { content: "★"; }
+
 /* 详情弹窗样式 - 全局样式 */
 .modal-overlay {
   position: fixed; /* 使用fixed而不是absolute，相对于视口定位 */
@@ -787,6 +1219,8 @@ const applyJob = () => {
   justify-content: center;
   align-items: center;
   z-index: 9999; /* 提高z-index确保在最上层 */
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
 }
 
 .modal-content {
@@ -795,9 +1229,20 @@ const applyJob = () => {
   max-height: 80vh;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 .modal-header {
@@ -848,10 +1293,17 @@ const applyJob = () => {
   border: none;
   cursor: pointer;
   transition: color 0.2s;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .close-btn:hover {
   color: #333;
+  background-color: #f5f7fa;
 }
 
 .modal-body {
@@ -954,6 +1406,176 @@ const applyJob = () => {
   background-color: #096dd9;
 }
 
+/* 商家弹窗样式 */
+.application-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+}
+
+.stat-label {
+  color: #666;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.applicants-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+}
+
+.applicant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.applicant-item:last-child {
+  border-bottom: none;
+}
+
+.applicant-info {
+  flex-grow: 1;
+}
+
+.applicant-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.applicant-education {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.applicant-experience {
+  font-size: 12px;
+  color: #999;
+}
+
+.applicant-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.view-resume-btn, .contact-btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.view-resume-btn:hover, .contact-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.no-applicants {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+}
+
+.job-details p {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.edit-btn, .view-applications-btn, .close-job-btn {
+  padding: 8px 15px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.edit-btn:hover, .view-applications-btn:hover, .close-job-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.view-applications-btn {
+  background-color: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+}
+
+.view-applications-btn:hover {
+  background-color: #096dd9;
+}
+
+.close-job-btn {
+  color: #f5222d;
+  border-color: #f5222d;
+}
+
+.close-job-btn:hover {
+  background-color: #fff1f0;
+}
+
+/* 简历弹窗样式 */
+.resume-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.resume-content {
+  line-height: 1.6;
+}
+
+.resume-section {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.resume-section:last-child {
+  border-bottom: none;
+}
+
+.resume-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.download-resume-btn {
+  background-color: #52c41a;
+  color: #fff;
+  border: none;
+}
+
+.download-resume-btn:hover {
+  background-color: #389e0d;
+}
+
 /* 提示弹窗 */
 .toast {
   position: fixed; /* 使用fixed定位 */
@@ -965,5 +1587,13 @@ const applyJob = () => {
   padding: 10px 20px;
   border-radius: 4px;
   z-index: 10000;
+  animation: fadeInOut 2s ease forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -10px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
 }
 </style>

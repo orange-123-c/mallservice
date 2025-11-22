@@ -1,6 +1,8 @@
 <template>
   <div class="feedback-board">
     <!-- 页面标题区 -->
+         <div class="board-container">
+
     <div class="board-header">
       <h1>意见公示台</h1>
       <p>查看其他消费者的建议和意见，共同参与商场服务的改进</p>
@@ -179,6 +181,7 @@
       </div>
     </div>
   </div>
+  </div><div></div>
 </template>
 
 <script setup>
@@ -352,12 +355,22 @@ const submitFeedback = () => {
 
 <style scoped>
 .feedback-board {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
+    background-image: url('../assets/beijing.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+overflow-y: auto;
+height: 100%;
   font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   background-color: #f8f9fa;
-  min-height: 100vh;
+  /* min-height: 100vh;
+    max-width: 1000px; */
+
+}
+/* 新增居中容器样式 */
+.board-container {
+  max-width: 1000px; /* 限制最大宽度 */
+  margin: 40px auto; /* 水平居中 */
 }
 
 .board-header {
@@ -367,7 +380,10 @@ const submitFeedback = () => {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  /* 移除原有background-color */
 }
+
+
 
 .board-header h1 {
   color: #2c3e50;
